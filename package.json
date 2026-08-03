@@ -2,7 +2,7 @@
   "name": "boby-monorepo",
   "private": true,
   "scripts": {
-    "build": "cd apps/storefront && npm run build",
+    "build": "cd apps/storefront && npm install && npm run build",
     "dev": "cd apps/storefront && npm run dev"
   }
 }
