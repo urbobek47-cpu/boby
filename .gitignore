@@ -1,0 +1,45 @@
+# dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# builds
+.next/
+out/
+build/
+dist/
+
+# env — never commit credentials (PayPlus, Green Invoice, Cloudinary, Sanity, DB)
+.env
+.env*.local
+.env.production
+
+# medusa
+.medusa/
+uploads/
+
+# testing / tooling
+coverage/
+*.tsbuildinfo
+next-env.d.ts
+.eslintcache
+
+# vercel
+.vercel
+
+# os / editor
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# spike 3 generated marketplace app (throwaway; only FINDINGS.md is kept)
+spikes/spike-3-order-split/marketplace/

@@ -1,0 +1,33 @@
+# Throwaway dev stack for spike 3 (and reused for Phase 1).
+# Postgres + Redis only. Tear down completely with:  docker compose down -v
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: boby-spike-pg
+    environment:
+      POSTGRES_USER: boby
+      POSTGRES_PASSWORD: boby
+      POSTGRES_DB: boby_mercur
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U boby -d boby_mercur"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    container_name: boby-spike-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  pgdata:

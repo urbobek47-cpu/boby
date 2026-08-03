@@ -1,0 +1,143 @@
+@import "tailwindcss";
+
+/*
+ * BOBY design tokens — the single source for colour, type, spacing, radii and
+ * motion (CLAUDE.md §3). Everything downstream references these; never hardcode
+ * a hex, px size or radius in a component.
+ *
+ * No dark mode. BOBY is a fixed gallery palette — a "quiet Tel Aviv gallery",
+ * light by definition. We deliberately drop the scaffold's prefers-color-scheme
+ * dark block; a second theme is out of scope for v1.
+ */
+
+@theme {
+  /* ---- colour (§3.1) ----
+     WARM system: Ur's explicit override of the build-plan's cool #FAFAFA,
+     adopting the approved mockup's "Material Warmth" (DECISIONS §3, 30.7.26).
+     Core tokens (text, accents, clay) are unchanged from the plan. */
+  --color-bg: #eceae6; /* warm-grey gallery background */
+  --color-surface: #ffffff; /* cards, panels — the "white cube" surface */
+  --color-sand: #efe6dc; /* warm panel / image bed */
+  --color-stone: #d7d2cb; /* warm mid neutral — soft borders, pills */
+  --color-deep: #2a211e; /* warm near-black — corporate hero, footer */
+  --color-text: #111827; /* body */
+  --color-text-muted: #4b5563; /* secondary — verify 4.5:1 on the bg in use */
+  --color-border: #e5e7eb;
+  --color-accent: #c17f59; /* DECORATIVE + display text >=24px ONLY (~3:1) */
+  --color-accent-strong: #8a5335; /* links, secondary actions (>=4.5:1) */
+  --color-accent-hover: #6f4229;
+  --color-btn-primary: #111827; /* primary purchase buttons are near-black */
+  --color-success: #2f6b4f;
+  --color-error: #9b2c2c;
+
+  /* type scale — mobile values; responsive step-ups live in utilities/JSX */
+  --text-display: 2rem; /* 32px  → 56px desktop */
+  --text-display--line-height: 1.2;
+  --text-h1: 1.625rem; /* 26px  → 40px */
+  --text-h1--line-height: 1.3;
+  --text-h2: 1.3125rem; /* 21px  → 28px */
+  --text-h2--line-height: 1.35;
+  --text-h3: 1.125rem; /* 18px  → 22px */
+  --text-h3--line-height: 1.4;
+  --text-body: 1rem; /* 16px  → 17px */
+  --text-body--line-height: 1.7; /* Hebrew needs the extra leading */
+  --text-small: 0.875rem; /* 14px */
+  --text-small--line-height: 1.6;
+  --text-caption: 0.8125rem; /* 13px */
+  --text-caption--line-height: 1.5;
+
+  /* ---- spacing scale (§3.3): 4 8 12 16 24 32 48 64 96 128 ---- */
+  --spacing: 4px;
+
+  /* ---- radii (§3.3) — DIFFERENTIATED, never uniform ---- */
+  --radius-artwork: 2px; /* the work is the object, not a card (0–4px) */
+  --radius-card: 8px; /* editorial cards */
+  --radius-control: 10px; /* forms & controls (10–12px) */
+  --radius-panel: 16px; /* large promotional panels */
+  --radius-pill: 9999px; /* compact tags */
+
+  /* ---- elevation (§3.3) — one soft shadow only ---- */
+  --shadow-soft: 0 1px 3px rgb(17 24 39 / 0.06), 0 8px 24px rgb(17 24 39 / 0.04);
+
+  /* ---- layout (§3.4) ---- */
+  --container-content: 1280px; /* content max-width */
+  --container-prose: 68ch; /* editorial text max-width */
+
+  /* ---- motion (§3.3) ---- */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-hover: 200ms;
+  --duration-page: 300ms;
+}
+
+/*
+ * Font tokens go in `@theme inline` (not plain `@theme`) because they
+ * reference next/font's runtime CSS vars (--font-assistant, --font-frank),
+ * which are set on <body> at render time, not statically at build. `inline`
+ * makes Tailwind substitute the value into the `font-body`/`font-display`
+ * utilities instead of trying to emit a :root variable that would be empty.
+ */
+@theme inline {
+  --font-body: var(--font-assistant), "Heebo", "Noto Sans Hebrew", system-ui,
+    sans-serif;
+  --font-display: var(--font-frank), Georgia, "Times New Roman", serif;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: var(--color-bg);
+    color: var(--color-text);
+    /* Direct stack — do not use var(--font-body) here; with `@theme inline`
+       that variable is not emitted to :root. The next/font vars are set on
+       <body> by the layout className. */
+    font-family: var(--font-assistant), "Heebo", "Noto Sans Hebrew", system-ui,
+      sans-serif;
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    /* Prevent horizontal overflow on mobile (§ core value: no unexpected
+       horizontal scrolling). Real overflow bugs still get fixed at source. */
+    overflow-x: hidden;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-frank), Georgia, "Times New Roman", serif;
+    font-weight: 500;
+    text-wrap: balance;
+  }
+
+  /* Visible focus ring on every interactive element (§5.1). */
+  :where(a, button, input, select, textarea, [tabindex]):focus-visible {
+    outline: 3px solid rgb(138 83 53 / 0.45); /* accent-strong @ 45% */
+    outline-offset: 3px;
+  }
+
+  /* Honour reduced-motion globally (§3.3, §5.1). */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* Screen-reader-only utility (§5.1) — for skip links and visually-hidden labels. */
+@utility sr-only {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
