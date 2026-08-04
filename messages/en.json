@@ -1,0 +1,244 @@
+{
+  "Meta": {
+    "title": "BOBY — a gallery and marketplace for Israeli handmade art",
+    "description": "Original art and craft from independent artists across Israel. Curated one by one."
+  },
+  "Nav": {
+    "brand": "BOBY — home",
+    "home": "Home",
+    "works": "Works",
+    "menu": "Menu",
+    "cart": "Cart",
+    "business": "Corporate gifts",
+    "shipping": "Free shipping over ₪500"
+  },
+  "Footer": {
+    "tagline": "A gallery and marketplace for original Israeli handmade art.",
+    "browse": "Browse",
+    "works": "All works",
+    "business": "Corporate gifts",
+    "terms": "Terms of Use",
+    "accessibility": "Accessibility Statement",
+    "newsletter": "Email updates",
+    "legalNote": "BOBY · registered dealer. Every piece ships with a tax invoice.",
+    "rights": "All rights reserved."
+  },
+  "Home": {
+    "hero": {
+      "eyebrow": "Israeli art and craft",
+      "title": "Israeli craft, curated one by one",
+      "subtitle": "Original art and craft from independent artists across Israel. Every piece has a name and a story behind it.",
+      "ctaPrimary": "Discover works",
+      "ctaSecondary": "Corporate gifts",
+      "featuredCaption": "Featured work"
+    },
+    "trust": {
+      "madeInIsrael": "Made in Israel",
+      "securePayment": "Secure payment",
+      "localShipping": "Local shipping"
+    },
+    "intent": {
+      "title": "Shop by intent",
+      "wedding": "Wedding gift",
+      "newHome": "Housewarming gift",
+      "under500": "Up to ₪500",
+      "original": "Original art"
+    },
+    "newArrivals": {
+      "title": "New arrivals",
+      "cta": "All works"
+    },
+    "featuredArtist": {
+      "title": "Featured artist",
+      "quote": "Each piece is fired twice — the colour only appears after the second firing.",
+      "cta": "More works by {name}"
+    },
+    "corporate": {
+      "eyebrow": "Gifts for staff and clients",
+      "title": "Original Israeli gifts. One invoice. Zero logistics headache.",
+      "body": "Curated boxes from independent artists, to your budget and quantity. We consolidate, pack and deliver — with a single invoice.",
+      "cta": "Get in touch"
+    },
+    "newsletter": {
+      "title": "New works, every few weeks",
+      "body": "No spam. Just a few selected works and artist stories, straight to your inbox.",
+      "emailLabel": "Email address",
+      "emailPlaceholder": "name@example.com",
+      "submit": "Subscribe",
+      "note": "Signup opens at launch."
+    }
+  },
+  "LocaleSwitcher": {
+    "he": "עברית",
+    "en": "English",
+    "label": "Choose language"
+  },
+  "Breadcrumb": {
+    "home": "Home",
+    "works": "Works",
+    "label": "Breadcrumb"
+  },
+  "ArtistPage": {
+    "worksTitle": "Works by {name}",
+    "empty": "No works are currently available from this artist."
+  },
+  "Artwork": {
+    "status": {
+      "unique": "One of a kind",
+      "edition": "Limited edition · {number}/{size}",
+      "madeToOrder": "Made to order",
+      "reserved": "In someone else's cart",
+      "sold": "Sold"
+    },
+    "panel": {
+      "by": "by",
+      "vatIncluded": "Price includes VAT",
+      "dimensions": "Dimensions",
+      "materials": "Materials",
+      "delivery": "Estimated delivery",
+      "deliveryInStock": "3–5 business days",
+      "deliveryWeeks": "about {weeks} weeks",
+      "shippingBand": "Shipping",
+      "shipping_SMALL": "Local shipping · small item",
+      "shipping_MEDIUM": "Local shipping · medium item",
+      "shipping_LARGE": "Local shipping · large item",
+      "shipping_OVERSIZE_QUOTE": "Shipping quoted on request",
+      "fragile": "Fragile — delivered to the door with signature",
+      "returns": "14-day returns",
+      "colorNote": "Colours may vary slightly between displays.",
+      "addToCart": "Add to cart",
+      "reservedTitle": "This piece is currently in another shopper's cart",
+      "reservedBody": "Try again in a few minutes — their order may not complete.",
+      "reservedCta": "Notify me when it frees up",
+      "soldTitle": "This piece has sold",
+      "soldBody": "It is one of a kind and won't return — but there are more works by the same artist.",
+      "soldCta": "Similar works",
+      "madeToOrderCta": "Order made to order",
+      "phase1Note": "The cart opens soon — the site is view-only for now."
+    },
+    "sections": {
+      "story": "Behind the work",
+      "artist": "About the artist",
+      "scale": "The work in a room",
+      "scaleNote": "Scale reference — the piece in a real space."
+    },
+    "gallery": {
+      "label": "Image gallery",
+      "thumbLabel": "Image {n}",
+      "placeholder": "Artwork image"
+    }
+  },
+  "Catalog": {
+    "title": "Works",
+    "intro": "Original art and craft from independent artists across Israel — curated one by one.",
+    "results": "{count, plural, =0 {No works} one {One work} other {# works}}",
+    "filters": "Filter",
+    "filtersAndSort": "Filter & sort",
+    "clearAll": "Clear all",
+    "activeFilters": "{count, plural, =0 {} one {1 active filter} other {# active filters}}",
+    "facet": {
+      "category": "Category",
+      "price": "Price",
+      "artist": "Artist"
+    },
+    "discipline": {
+      "ceramics": "Ceramics",
+      "jewelry": "Jewelry",
+      "painting": "Painting & print",
+      "sculpture": "Sculpture",
+      "wood": "Wood",
+      "textile": "Textile",
+      "judaica": "Judaica"
+    },
+    "price": {
+      "under-150": "₪0–150",
+      "150-350": "₪150–350",
+      "350-600": "₪350–600",
+      "600-1500": "₪600–1,500",
+      "1500-plus": "₪1,500+"
+    },
+    "sort": {
+      "label": "Sort",
+      "newest": "Newest",
+      "price-asc": "Price: low to high",
+      "price-desc": "Price: high to low"
+    },
+    "empty": {
+      "title": "No works match this filter",
+      "body": "Try widening the price range, or removing one filter.",
+      "cta": "Clear the filter"
+    }
+  },
+  "Business": {
+    "meta": {
+      "title": "Corporate gifts · BOBY",
+      "description": "Original Israeli gifts for staff and clients. One invoice, zero logistics headache."
+    },
+    "hero": {
+      "eyebrow": "Gifts for staff and clients",
+      "title": "Original Israeli gifts. One invoice. Zero logistics headache.",
+      "subtitle": "Curated boxes from independent artists, to your budget and quantity. We consolidate, pack and deliver.",
+      "ctaSample": "Request a sample box",
+      "ctaCall": "Book a short call"
+    },
+    "value": {
+      "madeTitle": "Genuinely Israeli",
+      "madeBody": "Every item is by an independent artist, with a name and a story.",
+      "logisticsTitle": "End-to-end logistics",
+      "logisticsBody": "To one central address, or straight to employees' homes.",
+      "invoiceTitle": "One invoice",
+      "invoiceBody": "We consolidate every artist into a single, orderly order."
+    },
+    "packages": {
+      "title": "Boxes by budget",
+      "subtitle": "A clear starting point, full customization after. Prices include VAT, packaging and a card with the artists' story.",
+      "perUnit": "per box",
+      "localName": "Local gesture",
+      "localContents": "Small ceramic piece · textile item · artist card",
+      "homeName": "Israeli home",
+      "homeContents": "Serving bowl · studio candle · branded packaging",
+      "galleryName": "Gallery box",
+      "galleryContents": "Centrepiece work · complementary item · personal dedication"
+    },
+    "terms": {
+      "title": "The terms, up front",
+      "minOrderLabel": "Minimum order",
+      "minOrderValue": "20 boxes (suggested)",
+      "leadLabel": "Lead time",
+      "leadValue": "4–6 weeks",
+      "depositLabel": "Deposit",
+      "depositValue": "40% on order",
+      "invoiceLabel": "Invoice",
+      "invoiceValue": "One tax invoice for the whole order",
+      "deliveryLabel": "Delivery",
+      "deliveryValue": "Consolidated or to employees' homes"
+    },
+    "how": {
+      "title": "How it works",
+      "s1Title": "A 20-minute call",
+      "s1Body": "Budget, quantity, timing and preferences.",
+      "s2Title": "Proposal and a physical sample",
+      "s2Body": "See and feel it before you decide.",
+      "s3Title": "Production and packing",
+      "s3Body": "We coordinate the work with the artists.",
+      "s4Title": "On-time delivery",
+      "s4Body": "Consolidated or to each employee's home."
+    },
+    "lead": {
+      "title": "Let's begin",
+      "subtitle": "Leave your details and we'll come back with an initial proposal and a sample box — matched to your budget and quantity.",
+      "fullName": "Full name",
+      "company": "Company",
+      "employees": "Approx. number of employees",
+      "chooseEmployees": "Choose",
+      "emp1": "20–50",
+      "emp2": "51–150",
+      "emp3": "151–500",
+      "emp4": "Over 500",
+      "email": "Email",
+      "sample": "I'd like to receive a physical sample box",
+      "submit": "Get an initial proposal",
+      "note": "The enquiry form opens at launch — this is a preview for now."
+    }
+  }
+}
