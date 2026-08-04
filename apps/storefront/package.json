@@ -11,6 +11,9 @@
     "check:logical": "node scripts/check-logical-properties.mjs",
     "check": "pnpm run typecheck && pnpm run lint && pnpm run check:logical"
   },
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "dependencies": {
     "next": "16.2.12",
     "next-intl": "^4.13.4",

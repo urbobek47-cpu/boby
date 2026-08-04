@@ -4,5 +4,8 @@
   "scripts": {
     "build": "cd apps/storefront && npm install && npm run build",
     "dev": "cd apps/storefront && npm run dev"
+  },
+  "engines": {
+    "node": ">=20.0.0"
   }
 }
