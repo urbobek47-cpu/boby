@@ -8,6 +8,7 @@ import { SITE_URL, seoAlternates } from "@/lib/site";
 import { AuthProvider } from "@/components/auth/auth-context";
 import { AuthModal } from "@/components/auth/auth-modal";
 import { AccessibilityWidget } from "@/components/ui/accessibility-widget";
+import { SupportChatWidget } from "@/components/ui/support-chat-widget";
 import "../globals.css";
 
 type LayoutParams = { locale: string };
@@ -63,6 +64,7 @@ export default async function LocaleLayout({
             {children}
             <AuthModal />
             <AccessibilityWidget />
+            <SupportChatWidget />
           </AuthProvider>
         </NextIntlClientProvider>
       </body>
