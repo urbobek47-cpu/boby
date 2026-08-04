@@ -32,6 +32,9 @@ export function SiteFooter() {
           <Link href="/terms" className="hover:text-accent-strong">
             {t("terms")}
           </Link>
+          <Link href="/accessibility" className="hover:text-accent-strong">
+            {t("accessibility")}
+          </Link>
           <Link href="/#newsletter" className="hover:text-accent-strong">
             {t("newsletter")}
           </Link>
