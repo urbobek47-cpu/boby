@@ -160,27 +160,71 @@ const artworks: Artwork[] = [
   },
 ];
 
+const dynamicArtworksStore: Artwork[] = [];
+
+export function addCustomArtwork(newArtwork: Artwork): void {
+  // Prevent duplicate insertion
+  if (!dynamicArtworksStore.some((a) => a.slug === newArtwork.slug)) {
+    dynamicArtworksStore.unshift(newArtwork);
+  }
+  try {
+    if (typeof window !== "undefined") {
+      const existing: Artwork[] = JSON.parse(localStorage.getItem("boby_custom_artworks") || "[]");
+      if (!existing.some((a) => a.slug === newArtwork.slug)) {
+        localStorage.setItem("boby_custom_artworks", JSON.stringify([newArtwork, ...existing]));
+      }
+    }
+  } catch {
+    // Ignore storage error
+  }
+}
+
+function getAllArtworks(): Artwork[] {
+  let custom: Artwork[] = [];
+  try {
+    if (typeof window !== "undefined") {
+      custom = JSON.parse(localStorage.getItem("boby_custom_artworks") || "[]");
+    }
+  } catch {
+    custom = [];
+  }
+  // Combine memory store, localStorage, and static fixture data
+  const combined = [...dynamicArtworksStore, ...custom, ...artworks];
+  const uniqueMap = new Map<string, Artwork>();
+  for (const item of combined) {
+    if (!uniqueMap.has(item.slug)) {
+      uniqueMap.set(item.slug, item);
+    }
+  }
+  return Array.from(uniqueMap.values());
+}
+
 /** Simulate async I/O so the Medusa/Sanity swap is a drop-in. */
 export async function getArtworkBySlug(slug: string): Promise<Artwork | null> {
-  return artworks.find((a) => a.slug === slug) ?? null;
+  const all = getAllArtworks();
+  return all.find((a) => a.slug === slug) ?? null;
 }
 
 export async function listArtworkSlugs(): Promise<string[]> {
-  return artworks.map((a) => a.slug);
+  const all = getAllArtworks();
+  return all.map((a) => a.slug);
 }
 
 export async function listArtworks(): Promise<Artwork[]> {
-  return artworks;
+  return getAllArtworks();
 }
 
 export async function listArtistSlugs(): Promise<string[]> {
-  return [...new Set(artworks.map((a) => a.artist.slug))];
+  const all = getAllArtworks();
+  return [...new Set(all.map((a) => a.artist.slug))];
 }
 
 export async function getArtistBySlug(slug: string): Promise<Artist | null> {
-  return artworks.find((a) => a.artist.slug === slug)?.artist ?? null;
+  const all = getAllArtworks();
+  return all.find((a) => a.artist.slug === slug)?.artist ?? null;
 }
 
 export async function listArtworksByArtist(slug: string): Promise<Artwork[]> {
-  return artworks.filter((a) => a.artist.slug === slug);
+  const all = getAllArtworks();
+  return all.filter((a) => a.artist.slug === slug);
 }

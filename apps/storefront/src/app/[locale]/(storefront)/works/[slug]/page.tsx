@@ -69,15 +69,16 @@ function ArtworkDetail({ artwork }: { artwork: Artwork }) {
   const t = useTranslations("Artwork");
   const bc = useTranslations("Breadcrumb");
 
-  const artistName = artwork.artist.displayName[locale];
-  const medium = artwork.category[locale];
+  const artistName = artwork.artist.displayName[locale] || artwork.artist.displayName.he;
+  const medium = artwork.category[locale] || artwork.category.he;
+  const storyText = artwork.story[locale] || artwork.story.he;
 
   // Meaningful alt per §5.1: title + artist + medium, then the shot's caption.
   const galleryImages: GalleryImage[] = artwork.images.map((img, i) => ({
     publicId: img.publicId,
     aspectRatio: img.aspectRatio,
-    caption: img.caption[locale],
-    alt: `${artwork.title[locale]} — ${artistName}, ${medium}. ${img.caption[locale]}`,
+    caption: img.caption[locale] || img.caption.he || "תמונת יצירה",
+    alt: `${artwork.title[locale] || artwork.title.he} — ${artistName}, ${medium}. ${img.caption[locale] || img.caption.he}`,
     thumbLabel: t("gallery.thumbLabel", { n: i + 1 }),
   }));
 
@@ -85,7 +86,7 @@ function ArtworkDetail({ artwork }: { artwork: Artwork }) {
 
   return (
     <main className="mx-auto max-w-[var(--container-content)] px-6 py-8 md:px-12 md:py-12 lg:px-16">
-      <Breadcrumb category={medium} title={artwork.title[locale]} bc={bc} />
+      <Breadcrumb category={medium} title={artwork.title[locale] || artwork.title.he} bc={bc} />
 
       {/* Desktop: image (end/left) + sticky panel (start/right). Mobile: image first. */}
       <div className="mt-6 flex flex-col gap-8 lg:flex-row-reverse lg:items-start lg:gap-12">
@@ -107,10 +108,21 @@ function ArtworkDetail({ artwork }: { artwork: Artwork }) {
 
       {/* Below the fold — story, scale, artist. Editorial prose width. */}
       <div className="mt-16 flex flex-col gap-16 md:mt-24">
-        <section className="max-w-[var(--container-prose)]">
-          <h2 className="text-h2 font-medium">{t("sections.story")}</h2>
-          <p className="mt-4 text-[length:var(--text-h3)] leading-relaxed text-text-muted">
-            {artwork.story[locale]}
+        {/* Prominent Artist's Story Highlight Section */}
+        <section className="max-w-[var(--container-prose)] rounded-panel border border-border bg-sand/50 p-6 md:p-8">
+          <div className="flex items-center gap-3">
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-accent text-surface text-small font-semibold">
+              🎨
+            </span>
+            <div>
+              <h2 className="text-h2 font-medium text-text">סיפור היצירה והאמן</h2>
+              <p className="text-caption text-text-muted">
+                מאת <bdi>{artistName}</bdi> · תהליך היצירה וההשראה בסטודיו
+              </p>
+            </div>
+          </div>
+          <p className="mt-4 text-[length:var(--text-h3)] leading-relaxed text-text font-serif">
+            {storyText}
           </p>
         </section>
 
