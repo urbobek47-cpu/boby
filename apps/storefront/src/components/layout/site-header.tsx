@@ -25,8 +25,8 @@ export function SiteHeader() {
           aria-label={t("menu")}
           className="mx-auto grid max-w-[var(--container-content)] grid-cols-3 items-center px-6 py-4 md:px-12 md:py-5 lg:px-16"
         >
-          <ul role="list" className="flex items-center gap-1 justify-self-start text-small font-medium">
-            <li className="hidden sm:block">
+          <ul role="list" className="hidden md:flex items-center gap-1 justify-self-start text-small font-medium">
+            <li>
               <Link href="/" className="rounded-[6px] px-2 py-2 text-text hover:text-accent-strong">
                 {t("home")}
               </Link>
@@ -36,12 +36,23 @@ export function SiteHeader() {
                 {t("works")}
               </Link>
             </li>
-            <li className="hidden sm:block">
+            <li>
               <Link href="/business" className="rounded-[6px] px-2 py-2 text-text hover:text-accent-strong">
                 {t("business")}
               </Link>
             </li>
           </ul>
+
+          {/* Mobile Search Icon */}
+          <div className="flex items-center justify-self-start text-small font-medium md:hidden">
+            <Link
+              href="/works"
+              aria-label="חיפוש יצירות"
+              className="rounded-control p-1.5 text-lg text-text hover:text-accent-strong"
+            >
+              🔍
+            </Link>
+          </div>
 
           <Link
             href="/"

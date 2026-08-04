@@ -1,3 +1,4 @@
+import React from "react";
 import type { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
 import { getTranslations } from "next-intl/server";
@@ -62,6 +63,8 @@ export default async function CataloguePage({
   );
 }
 
+import { ArtistSpotlightCard } from "@/components/catalog/artist-spotlight-card";
+
 function CatalogueView({
   filtered,
   filters,
@@ -76,33 +79,41 @@ function CatalogueView({
   const t = useTranslations("Catalog");
 
   return (
-    <main className="mx-auto max-w-[var(--container-content)] px-6 py-10 md:px-12 md:py-16 lg:px-16">
-      <header className="flex flex-col gap-3">
+    <main className="mx-auto max-w-[var(--container-content)] px-3 py-6 md:px-12 md:py-16 lg:px-16">
+      <header className="flex flex-col gap-3 px-2 md:px-0">
         <h1 className="text-[length:var(--text-h1)] font-medium md:text-[2.5rem]">
           {t("title")}
         </h1>
         <p className="max-w-[var(--container-prose)] text-text-muted">{t("intro")}</p>
       </header>
 
-      <div className="mt-8 rounded-panel bg-sand p-5 md:p-6">
+      <div className="mt-6 rounded-panel bg-sand p-4 md:p-6">
         <FilterPanel activeCount={activeFilterCount(filters)}>
           <FilterBar filters={filters} categories={categories} artists={artists} />
         </FilterPanel>
       </div>
 
-      <p className="mt-8 text-small text-text-muted" aria-live="polite">
+      <p className="mt-6 px-2 md:px-0 text-small text-text-muted" aria-live="polite">
         {t("results", { count: filtered.length })}
       </p>
 
       {filtered.length > 0 ? (
         <ul
           role="list"
-          className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3"
+          className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-2 md:grid-cols-3 md:gap-x-6 md:gap-y-10"
         >
-          {filtered.map((artwork) => (
-            <li key={artwork.slug}>
-              <ArtworkCard artwork={artwork} />
-            </li>
+          {filtered.map((artwork, index) => (
+            <React.Fragment key={artwork.slug}>
+              <li>
+                <ArtworkCard artwork={artwork} />
+              </li>
+              {/* Interspersed Story Card every 5 items */}
+              {(index + 1) % 5 === 0 && artwork.artist && (
+                <li className="col-span-2 md:col-span-3">
+                  <ArtistSpotlightCard artist={artwork.artist} />
+                </li>
+              )}
+            </React.Fragment>
           ))}
         </ul>
       ) : (

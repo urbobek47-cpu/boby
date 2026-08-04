@@ -22,27 +22,29 @@ export function ArtworkCard({ artwork }: { artwork: Artwork }) {
   return (
     <Link
       href={`/works/${artwork.slug}`}
-      className="group flex flex-col gap-3 rounded-card focus-visible:outline-none"
+      className="group flex flex-col gap-2 md:gap-3 rounded-card focus-visible:outline-none"
     >
-      <ArtImage
-        publicId={primary?.publicId ?? null}
-        alt={`${artwork.title[locale]} — ${artwork.artist.displayName[locale]}, ${artwork.category[locale]}`}
-        aspectRatio={primary?.aspectRatio ?? 1}
-        sizes="(min-width: 1024px) 400px, (min-width: 640px) 45vw, 90vw"
-        placeholderLabel={artwork.category[locale]}
-        className="transition-transform duration-[var(--duration-hover)] ease-[var(--ease-out)] group-hover:scale-[1.01]"
-      />
+      <div className="overflow-hidden rounded-artwork bg-sand/30 shadow-sm transition-shadow group-hover:shadow-md">
+        <ArtImage
+          publicId={primary?.publicId ?? null}
+          alt={`${artwork.title[locale] || artwork.title.he} — ${artwork.artist.displayName[locale] || artwork.artist.displayName.he}`}
+          aspectRatio={primary?.aspectRatio ?? (4 / 5)}
+          sizes="(min-width: 1024px) 400px, (min-width: 640px) 45vw, 50vw"
+          placeholderLabel={artwork.category[locale] || artwork.category.he}
+          className="transition-transform duration-300 ease-out group-hover:scale-105"
+        />
+      </div>
 
-      <div className="flex flex-col gap-1">
-        <h3 className="text-h3 font-medium underline-offset-4 group-hover:text-accent-strong group-hover:underline">
-          {artwork.title[locale]}
+      <div className="flex flex-col gap-0.5 md:gap-1 px-0.5">
+        <h3 className="text-small md:text-h3 font-medium text-text underline-offset-4 group-hover:text-accent-strong truncate">
+          {artwork.title[locale] || artwork.title.he}
         </h3>
-        <p className="text-small text-text-muted">
-          <bdi>{artwork.artist.displayName[locale]}</bdi>
+        <p className="text-caption md:text-small text-text-muted truncate">
+          <bdi>{artwork.artist.displayName[locale] || artwork.artist.displayName.he}</bdi>
         </p>
-        <div className="mt-1 flex items-baseline justify-between gap-3">
-          <Price agorot={artwork.priceAgorot} className="text-body font-semibold" />
-          <span className={statusMuted ? "text-caption text-text-muted" : "text-caption text-accent-strong"}>
+        <div className="mt-0.5 flex items-baseline justify-between gap-2">
+          <Price agorot={artwork.priceAgorot} className="text-small md:text-body font-semibold text-text" />
+          <span className={statusMuted ? "text-caption text-text-muted/70" : "text-caption text-accent-strong font-medium"}>
             {t(status.key, status.values)}
           </span>
         </div>

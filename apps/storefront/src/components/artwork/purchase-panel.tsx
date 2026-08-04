@@ -75,6 +75,17 @@ export function PurchasePanel({ artwork }: { artwork: Artwork }) {
       <ActionBlock artwork={artwork} />
 
       <p className="text-caption text-text-muted">{t("returns")} · {t("colorNote")}</p>
+
+      {/* Mobile Sticky Bottom Purchase Bar (Screen width < 768px) */}
+      <div className="fixed bottom-16 start-0 end-0 z-30 flex items-center justify-between gap-4 border-t border-border bg-surface/95 px-5 py-3 shadow-lg backdrop-blur-md md:hidden">
+        <div className="flex flex-col">
+          <span className="text-caption text-text-muted">מחיר כולל מע״מ</span>
+          <Price agorot={artwork.priceAgorot} className="text-body font-bold text-text" />
+        </div>
+        <Button variant="primary" className="px-5 py-2 text-small">
+          {artwork.inventoryKind === "MADE_TO_ORDER" ? "להזמנה לפי מידה" : "הוספה לסל"}
+        </Button>
+      </div>
     </div>
   );
 }
