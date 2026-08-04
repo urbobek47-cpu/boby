@@ -48,6 +48,8 @@ export default async function HomePage({
   );
 }
 
+import { StoriesBar } from "@/components/catalog/stories-bar";
+
 function Home({
   featured,
   newArrivals,
@@ -60,6 +62,9 @@ function Home({
   return (
     <>
       <Hero featured={featured} />
+      <section className="mx-auto max-w-[var(--container-content)] px-6 pt-6 md:px-12">
+        <StoriesBar />
+      </section>
       <TrustRow />
       <IntentNav />
       <NewArrivals artworks={newArrivals} />

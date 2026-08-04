@@ -64,6 +64,7 @@ export default async function CataloguePage({
 }
 
 import { ArtistSpotlightCard } from "@/components/catalog/artist-spotlight-card";
+import { StoriesBar } from "@/components/catalog/stories-bar";
 
 function CatalogueView({
   filtered,
@@ -86,6 +87,11 @@ function CatalogueView({
         </h1>
         <p className="max-w-[var(--container-prose)] text-text-muted">{t("intro")}</p>
       </header>
+
+      {/* Instagram Stories Bar */}
+      <div className="mt-4 border-b border-border/60 pb-2">
+        <StoriesBar />
+      </div>
 
       <div className="mt-6 rounded-panel bg-sand p-4 md:p-6">
         <FilterPanel activeCount={activeFilterCount(filters)}>
