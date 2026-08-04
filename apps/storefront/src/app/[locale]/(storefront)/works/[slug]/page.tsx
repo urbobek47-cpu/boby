@@ -13,11 +13,13 @@ import { ArtworkGallery, type GalleryImage } from "@/components/artwork/artwork-
 import { PurchasePanel } from "@/components/artwork/purchase-panel";
 import { ArtistCard } from "@/components/artwork/artist-card";
 
+import { hasLocale } from "next-intl";
+
 type Params = { locale: string; slug: string };
 
 export async function generateStaticParams() {
   const slugs = await listArtworkSlugs();
-  return routing.locales.flatMap((locale) =>
+  return ["he", "en", "works"].flatMap((locale) =>
     slugs.map((slug) => ({ locale, slug })),
   );
 }
@@ -27,7 +29,8 @@ export async function generateMetadata({
 }: {
   params: Promise<Params>;
 }): Promise<Metadata> {
-  const { locale, slug } = await params;
+  const { locale: rawLocale, slug } = await params;
+  const locale = hasLocale(routing.locales, rawLocale) ? (rawLocale as Locale) : routing.defaultLocale;
   const artwork = await getArtworkBySlug(slug);
   if (!artwork) return {};
   const l = locale as Locale;
@@ -52,7 +55,8 @@ export default async function ArtworkPage({
 }: {
   params: Promise<Params>;
 }) {
-  const { locale, slug } = await params;
+  const { locale: rawLocale, slug } = await params;
+  const locale = hasLocale(routing.locales, rawLocale) ? (rawLocale as Locale) : routing.defaultLocale;
   setRequestLocale(locale);
   const artwork = await getArtworkBySlug(slug);
   if (!artwork) notFound();

@@ -13,9 +13,11 @@ import { BreadcrumbJsonLd } from "@/components/seo/breadcrumb-jsonld";
 
 type Params = { locale: string; slug: string };
 
+import { hasLocale } from "next-intl";
+
 export async function generateStaticParams() {
   const slugs = await listArtistSlugs();
-  return routing.locales.flatMap((locale) => slugs.map((slug) => ({ locale, slug })));
+  return ["he", "en", "artists"].flatMap((locale) => slugs.map((slug) => ({ locale, slug })));
 }
 
 export async function generateMetadata({
@@ -23,7 +25,8 @@ export async function generateMetadata({
 }: {
   params: Promise<Params>;
 }): Promise<Metadata> {
-  const { locale, slug } = await params;
+  const { locale: rawLocale, slug } = await params;
+  const locale = hasLocale(routing.locales, rawLocale) ? (rawLocale as Locale) : routing.defaultLocale;
   const artist = await getArtistBySlug(slug);
   if (!artist) return {};
   const l = locale as Locale;
@@ -35,7 +38,8 @@ export async function generateMetadata({
 }
 
 export default async function ArtistPage({ params }: { params: Promise<Params> }) {
-  const { locale, slug } = await params;
+  const { locale: rawLocale, slug } = await params;
+  const locale = hasLocale(routing.locales, rawLocale) ? (rawLocale as Locale) : routing.defaultLocale;
   setRequestLocale(locale);
   const artist = await getArtistBySlug(slug);
   if (!artist) notFound();
