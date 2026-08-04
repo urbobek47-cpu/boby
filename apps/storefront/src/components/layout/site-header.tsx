@@ -1,10 +1,11 @@
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { LocaleToggle } from "@/components/layout/locale-toggle";
+import { UserMenu } from "@/components/auth/user-menu";
 
 /**
  * Shared site header. A slim shipping-note bar (~30px), then a three-part row:
- * nav (start) · wordmark (centre) · cart (end). Nav links only to pages that
+ * nav (start) · wordmark (centre) · cart & auth (end). Nav links only to pages that
  * exist. On mobile only "יצירות" + cart show beside the wordmark (which is the
  * home link); secondary links appear from the tablet breakpoint up.
  *
@@ -50,7 +51,8 @@ export function SiteHeader() {
             BOBY
           </Link>
 
-          <div className="flex items-center gap-1 justify-self-end text-small">
+          <div className="flex items-center gap-2 justify-self-end text-small">
+            <UserMenu />
             <LocaleToggle />
             <span className="rounded-[6px] px-2 py-2 font-medium text-text">
               {t("cart")} <span dir="ltr">(0)</span>

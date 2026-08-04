@@ -5,6 +5,8 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { routing, localeDirection, type Locale } from "@/i18n/routing";
 import { fontVariables } from "@/fonts";
 import { SITE_URL, seoAlternates } from "@/lib/site";
+import { AuthProvider } from "@/components/auth/auth-context";
+import { AuthModal } from "@/components/auth/auth-modal";
 import "../globals.css";
 
 type LayoutParams = { locale: string };
@@ -55,7 +57,12 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} dir={dir}>
       <body className={fontVariables}>
-        <NextIntlClientProvider>{children}</NextIntlClientProvider>
+        <NextIntlClientProvider>
+          <AuthProvider>
+            {children}
+            <AuthModal />
+          </AuthProvider>
+        </NextIntlClientProvider>
       </body>
     </html>
   );
