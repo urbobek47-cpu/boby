@@ -19,6 +19,7 @@ export function AuthModal() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
   const [studioName, setStudioName] = useState("");
   const [discipline, setDiscipline] = useState("קרמיקה");
   const [showPassword, setShowPassword] = useState(false);
@@ -36,6 +37,7 @@ export function AuthModal() {
       setPassword("");
       setConfirmPassword("");
       setFullName("");
+      setPhone("");
       setStudioName("");
     }
   }, [isAuthModalOpen, activeRole, activeMode]);
@@ -71,6 +73,14 @@ export function AuthModal() {
         setError("נא להזין שם מלא");
         return;
       }
+      // Mandatory Phone Number check specifically for Artist Signup
+      if (activeRole === "artist") {
+        const cleanPhone = phone.replace(/\D/g, "");
+        if (!phone.trim() || cleanPhone.length < 9) {
+          setError("נא להזין מספר טלפון תקין ליצירת קשר עם הסטודיו (לדוגמה: 050-1234567)");
+          return;
+        }
+      }
       if (password !== confirmPassword) {
         setError("הסיסמאות אינן תואמות");
         return;
@@ -89,6 +99,7 @@ export function AuthModal() {
         name: userName,
         email: email.trim(),
         role: role,
+        phone: role === "artist" ? phone.trim() : undefined,
         studioName: role === "artist" ? studioName || userName : undefined,
         discipline: role === "artist" ? discipline : undefined,
       });
@@ -350,6 +361,28 @@ export function AuthModal() {
                     <option value="צורפות ותכשיטים">צורפות ותכשיטים</option>
                     <option value="זכוכית ומתכת">זכוכית ומתכת</option>
                   </select>
+                </div>
+              )}
+
+              {/* Artist Phone Number (Mandatory for Artist Signup) */}
+              {activeMode === "signup" && activeRole === "artist" && (
+                <div>
+                  <label
+                    htmlFor="auth-phone"
+                    className="block mb-1 text-small font-medium text-text"
+                  >
+                    מספר טלפון לתיאום וקשר עם הסטודיו <span className="text-accent-strong">*</span>
+                  </label>
+                  <input
+                    id="auth-phone"
+                    type="tel"
+                    dir="ltr"
+                    required
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="050-1234567"
+                    className="min-h-11 w-full rounded-control border border-border bg-surface px-3.5 text-body placeholder:text-text-muted/60 focus:border-accent-strong focus:outline-none focus:ring-1 focus:ring-accent-strong"
+                  />
                 </div>
               )}
 
