@@ -34,21 +34,21 @@ export function UserMenu() {
 
   if (!user) {
     return (
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-0.5 sm:gap-1">
         <button
           type="button"
           onClick={() => openAuthModal(null, "login")}
-          className="rounded-[6px] px-2.5 py-1.5 text-small font-medium text-text transition-colors hover:text-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-strong"
+          className="rounded-control px-2 py-1 text-small font-medium text-text transition-colors hover:text-accent-strong focus-visible:outline-none"
         >
           התחברות
         </button>
-        <span className="text-text-muted/40" aria-hidden="true">
+        <span className="hidden sm:inline text-text-muted/40" aria-hidden="true">
           |
         </span>
         <button
           type="button"
           onClick={() => openAuthModal(null, "signup")}
-          className="rounded-[6px] px-2.5 py-1.5 text-small font-medium text-accent-strong transition-colors hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-strong"
+          className="hidden sm:inline-block rounded-control px-2 py-1 text-small font-medium text-accent-strong transition-colors hover:underline focus-visible:outline-none"
         >
           הרשמה
         </button>

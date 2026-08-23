@@ -95,17 +95,17 @@ export function AccessibilityWidget() {
   };
 
   return (
-    <div className="fixed bottom-6 start-6 z-50" ref={menuRef}>
-      {/* Trigger Button */}
+    <div className="fixed bottom-20 start-4 z-30 md:bottom-6 md:start-6" ref={menuRef}>
+      {/* Trigger Button - Minimalist Transparent Icon without background circle */}
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
         aria-haspopup="true"
         aria-label="תפריט נגישות והתאמות קריאה"
-        className="flex h-12 w-12 items-center justify-center rounded-full bg-deep text-surface shadow-lg transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent-strong"
+        className="flex h-10 w-10 items-center justify-center bg-transparent text-text hover:scale-110 transition-transform focus-visible:outline-none p-0 border-0 shadow-none"
       >
-        <span className="text-xl" aria-hidden="true">
+        <span className="text-2xl drop-shadow-sm" aria-hidden="true">
           ♿
         </span>
       </button>
