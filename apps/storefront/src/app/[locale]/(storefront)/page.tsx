@@ -30,6 +30,9 @@ export async function generateMetadata({
   };
 }
 
+import { StoriesBar } from "@/components/catalog/stories-bar";
+import { PinterestMasonryGrid } from "@/components/catalog/pinterest-masonry-grid";
+
 export default async function HomePage({
   params,
 }: {
@@ -44,30 +47,52 @@ export default async function HomePage({
   const featuredArtist = featured.artist;
 
   return (
-    <Home featured={featured} newArrivals={newArrivals} artist={featuredArtist} />
+    <Home featured={featured} newArrivals={newArrivals} artist={featuredArtist} allArtworks={all} />
   );
 }
-
-import { StoriesBar } from "@/components/catalog/stories-bar";
 
 function Home({
   featured,
   newArrivals,
   artist,
+  allArtworks,
 }: {
   featured: Artwork;
   newArrivals: Artwork[];
   artist: Artist;
+  allArtworks: Artwork[];
 }) {
   return (
     <>
       <Hero featured={featured} />
-      <section className="mx-auto max-w-[var(--container-content)] px-6 pt-6 md:px-12">
+
+      {/* Stories Bar */}
+      <section className="mx-auto max-w-[var(--container-content)] px-4 pt-6 md:px-8">
         <StoriesBar />
       </section>
+
       <TrustRow />
       <IntentNav />
-      <NewArrivals artworks={newArrivals} />
+
+      {/* Pinterest-Style Social Network Feed for Artist Showcase */}
+      <section className="mx-auto mt-12 md:mt-16 max-w-[var(--container-content)] px-3 md:px-6">
+        <div className="mb-6 flex flex-col md:flex-row md:items-end justify-between gap-2 border-b border-border pb-4">
+          <div>
+            <span className="text-caption font-bold text-accent-strong uppercase tracking-wider">
+              פיד יוצרים וסטודיו מקומי
+            </span>
+            <h2 className="text-h2 font-medium text-text md:text-[2rem]">
+              גלה עבודות יד וסיפורי אמנים
+            </h2>
+          </div>
+          <p className="text-small text-text-muted">
+            לחץ על כל כרטיס לגילוי הסטודיו והקולקציה המלאה של היוצר/ת
+          </p>
+        </div>
+
+        <PinterestMasonryGrid artworks={allArtworks} />
+      </section>
+
       <FeaturedArtist artist={artist} />
       <CorporatePanel />
       <Newsletter />

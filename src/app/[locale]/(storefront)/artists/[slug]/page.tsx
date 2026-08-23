@@ -9,6 +9,7 @@ import type { Artist, Artwork } from "@/lib/catalog/types";
 import { seoAlternates, localePath } from "@/lib/site";
 import { ArtImage } from "@/components/media/art-image";
 import { ArtworkCard } from "@/components/catalog/artwork-card";
+import { PinterestMasonryGrid } from "@/components/catalog/pinterest-masonry-grid";
 import { BreadcrumbJsonLd } from "@/components/seo/breadcrumb-jsonld";
 
 type Params = { locale: string; slug: string };
@@ -54,7 +55,7 @@ function ArtistProfile({ artist, works }: { artist: Artist; works: Artwork[] }) 
   const name = artist.displayName[locale];
 
   return (
-    <main className="mx-auto max-w-[var(--container-content)] px-6 py-8 md:px-12 md:py-12 lg:px-16">
+    <main className="mx-auto max-w-[var(--container-content)] px-4 py-6 md:px-10 md:py-12">
       <nav aria-label={bc("label")}>
         <ol className="flex flex-wrap items-center gap-2 text-caption text-text-muted">
           <li>
@@ -75,42 +76,40 @@ function ArtistProfile({ artist, works }: { artist: Artist; works: Artwork[] }) 
         </ol>
       </nav>
 
-      {/* Portrait + story */}
-      <div className="mt-8 flex flex-col gap-8 md:flex-row md:items-start md:gap-12">
+      {/* Studio Header Showcase */}
+      <div className="mt-6 flex flex-col gap-6 md:flex-row md:items-center md:gap-10 rounded-panel bg-sand/60 p-6 md:p-10 border border-border">
         <ArtImage
           publicId={artist.portraitPublicId}
           alt={`${name} — ${artist.location[locale]}`}
           aspectRatio={3 / 2}
-          sizes="(min-width: 768px) 460px, 100vw"
+          sizes="(min-width: 768px) 420px, 100vw"
           rounded="rounded-panel"
-          className="w-full shrink-0 bg-stone md:max-w-[460px]"
+          className="w-full shrink-0 bg-stone md:max-w-[420px] shadow-sm"
         />
-        <div className="flex flex-col gap-4">
-          <div>
-            <h1 className="text-[length:var(--text-h1)] font-medium md:text-[2.5rem]">
-              <bdi>{name}</bdi>
-            </h1>
-            <p className="mt-1 text-text-muted">
-              <bdi>{artist.location[locale]}</bdi>
-            </p>
-          </div>
-          <p className="max-w-[var(--container-prose)] text-[length:var(--text-h3)] leading-relaxed text-text-muted">
-            {artist.bio[locale]}
+        <div className="flex flex-col gap-3">
+          <span className="inline-block rounded-full bg-accent-strong/10 text-accent-strong px-3 py-1 text-caption font-semibold self-start">
+            אמן/ית BOBY מאומת/ת
+          </span>
+          <h1 className="text-[length:var(--text-h1)] font-medium text-text md:text-[2.5rem]">
+            <bdi>{name}</bdi>
+          </h1>
+          <p className="text-small font-medium text-text-muted">
+            📍 <bdi>{artist.location[locale]}</bdi>
+          </p>
+          <p className="max-w-[var(--container-prose)] text-[length:var(--text-h3)] font-serif leading-relaxed text-text">
+            &quot;{artist.bio[locale]}&quot;
           </p>
         </div>
       </div>
 
-      {/* Their works */}
-      <section className="mt-16 md:mt-24">
-        <h2 className="text-h2 font-medium">{t("worksTitle", { name })}</h2>
+      {/* Their Collection in Pinterest Grid */}
+      <section className="mt-12 md:mt-16">
+        <div className="mb-6 border-b border-border pb-4">
+          <h2 className="text-h2 font-medium text-text">{t("worksTitle", { name })}</h2>
+          <p className="text-small text-text-muted">כל היצירות זמינות לרכישה ישירה מהסטודיו</p>
+        </div>
         {works.length > 0 ? (
-          <ul role="list" className="mt-8 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-            {works.map((artwork) => (
-              <li key={artwork.slug}>
-                <ArtworkCard artwork={artwork} />
-              </li>
-            ))}
-          </ul>
+          <PinterestMasonryGrid artworks={works} />
         ) : (
           <p className="mt-6 text-text-muted">{t("empty")}</p>
         )}
