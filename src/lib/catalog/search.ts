@@ -188,28 +188,45 @@ export function searchCatalog(allArtworks: Artwork[], rawQuery: string): SearchR
   const priceIntent = parsePriceIntent(query);
   const textQuery = (priceIntent ? priceIntent.cleanedQuery : query).trim();
   const normalizedText = normalizeHebrew(textQuery);
+  const rawWords = normalizedText.split(/\s+/).filter(Boolean);
 
-  // 2. Artist Intent Recognition
+  // 2. Artist Intent Recognition (Strict exact token / full name match)
   let matchedArtist: Artist | undefined = undefined;
   if (normalizedText.length >= 2) {
     for (const artwork of allArtworks) {
       const artist = artwork.artist;
       const artistHe = normalizeHebrew(artist.displayName.he);
       const artistEn = normalizeHebrew(artist.displayName.en);
-      if (artistHe.includes(normalizedText) || artistEn.includes(normalizedText) || normalizedText.includes(artistHe)) {
+
+      const isMatch =
+        artistHe === normalizedText ||
+        artistEn === normalizedText ||
+        rawWords.some(
+          (w) =>
+            w.length >= 3 &&
+            (artistHe.split(/\s+/).includes(w) ||
+              artistEn.split(/\s+/).includes(w) ||
+              artistHe.split(/\s+/).includes(stripHebrewPrefix(w)))
+        );
+
+      if (isMatch) {
         matchedArtist = artist;
         break;
       }
     }
   }
 
-  // 3. Category / Discipline Intent Recognition
+  // 3. Category / Discipline Intent Recognition (Strict exact token match)
   let matchedDiscipline: { key: Discipline; heLabel: string } | undefined = undefined;
   if (normalizedText.length >= 2) {
     for (const disc of DISCIPLINE_MAP) {
       const isMatch = disc.synonyms.some((syn) => {
         const normSyn = normalizeHebrew(syn);
-        return normalizedText === normSyn || normalizedText.includes(normSyn) || normSyn.includes(normalizedText);
+        return (
+          normalizedText === normSyn ||
+          rawWords.includes(normSyn) ||
+          rawWords.some((w) => stripHebrewPrefix(w) === normSyn)
+        );
       });
       if (isMatch) {
         matchedDiscipline = { key: disc.key, heLabel: disc.he };
@@ -219,7 +236,6 @@ export function searchCatalog(allArtworks: Artwork[], rawQuery: string): SearchR
   }
 
   // Tokenize ONLY remaining text after price/artist/category parsing
-  const rawWords = normalizedText.split(/\s+/).filter(Boolean);
   const tokens = rawWords.filter((w) => !STOP_WORDS.has(w) && w.length >= 2);
 
   // 4. Strict Filtering over catalog
@@ -248,7 +264,7 @@ export function searchCatalog(allArtworks: Artwork[], rawQuery: string): SearchR
       }
     }
 
-    // Constraint D: Keyword Matching Filter
+    // Constraint D: Keyword Matching Filter (EXCLUDES storyHe to prevent broad substring false positives!)
     if (tokens.length > 0) {
       const categoryMatchWord = matchedDiscipline && tokens.some(t => matchedDiscipline.heLabel.includes(t) || t.includes(matchedDiscipline.heLabel));
       const artistMatchWord = matchedArtist && tokens.some(t => normalizeHebrew(matchedArtist.displayName.he).includes(t));
@@ -256,16 +272,18 @@ export function searchCatalog(allArtworks: Artwork[], rawQuery: string): SearchR
       if (!categoryMatchWord && !artistMatchWord) {
         const titleHe = normalizeHebrew(artwork.title.he);
         const titleEn = normalizeHebrew(artwork.title.en);
-        const storyHe = normalizeHebrew(artwork.story.he);
         const categoryHe = normalizeHebrew(artwork.category.he);
         const artistNameHe = normalizeHebrew(artwork.artist.displayName.he);
         const materialsHe = artwork.materials.he.map(normalizeHebrew).join(" ");
-        const searchableText = `${titleHe} ${titleEn} ${storyHe} ${categoryHe} ${artistNameHe} ${materialsHe}`;
+
+        // Searchable text strictly uses structured fields ONLY (NO storyHe!)
+        const searchableText = `${titleHe} ${titleEn} ${categoryHe} ${artistNameHe} ${materialsHe}`;
 
         const allTokensMatch = tokens.every((token) => {
           const stripped = stripHebrewPrefix(token);
           return searchableText.includes(token) || (stripped.length >= 2 && searchableText.includes(stripped));
         });
+
         if (!allTokensMatch) return false;
       }
     }
