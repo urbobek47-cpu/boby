@@ -16,9 +16,13 @@ import {
   activeFilterCount,
   type FilterParams,
 } from "@/lib/catalog/filters";
+import { searchCatalog, type SearchResult } from "@/lib/catalog/search";
 import { ArtworkCard } from "@/components/catalog/artwork-card";
 import { FilterBar } from "@/components/catalog/filter-bar";
 import { FilterPanel } from "@/components/catalog/filter-panel";
+import { ArtistSpotlightCard } from "@/components/catalog/artist-spotlight-card";
+import { StoriesBar } from "@/components/catalog/stories-bar";
+import { SearchEmptyState } from "@/components/catalog/search-empty-state";
 
 type Params = { locale: string };
 type Search = Record<string, string | string[] | undefined>;
@@ -33,8 +37,6 @@ export async function generateMetadata({
   return {
     title: `${t("title")} · BOBY`,
     description: t("intro"),
-    // Filtered views (?category=…) are the same catalogue — canonical + hreflang
-    // point at the base /works, so query variants don't fragment indexing.
     alternates: seoAlternates(locale as Locale, "/works"),
   };
 }
@@ -53,27 +55,35 @@ export default async function CataloguePage({
   const filters = parseFilters(await searchParams);
   const filtered = applyFilters(list, filters);
 
+  let searchInfo: SearchResult | undefined = undefined;
+  if (filters.search) {
+    searchInfo = searchCatalog(list, filters.search);
+  }
+
   return (
     <CatalogueView
+      allArtworks={list}
       filtered={filtered}
       filters={filters}
+      searchInfo={searchInfo}
       categories={categoryOptions(list)}
       artists={artistOptions(list)}
     />
   );
 }
 
-import { ArtistSpotlightCard } from "@/components/catalog/artist-spotlight-card";
-import { StoriesBar } from "@/components/catalog/stories-bar";
-
 function CatalogueView({
+  allArtworks,
   filtered,
   filters,
+  searchInfo,
   categories,
   artists,
 }: {
+  allArtworks: Artwork[];
   filtered: Artwork[];
   filters: FilterParams;
+  searchInfo?: SearchResult;
   categories: Discipline[];
   artists: Array<{ slug: string; name: Record<Locale, string> }>;
 }) {
@@ -92,6 +102,55 @@ function CatalogueView({
       <div className="mt-4 border-b border-border/60 pb-2">
         <StoriesBar />
       </div>
+
+      {/* Search Intent Badges & Artist Feature Highlights */}
+      {searchInfo && (
+        <div className="mt-4 flex flex-col gap-3">
+          {/* Price Intent Banner */}
+          {searchInfo.priceIntent && (
+            <div className="flex items-center gap-2 rounded-control bg-accent/15 px-4 py-2.5 text-small font-medium text-accent-strong border border-accent/30">
+              <span>🏷️</span>
+              <span>
+                זיהינו כוונת מחיר בחיפוש: <strong>{searchInfo.priceIntent.label}</strong>
+              </span>
+            </div>
+          )}
+
+          {/* Artist Intent Match Banner */}
+          {searchInfo.matchedArtist && (
+            <div className="flex items-center justify-between rounded-panel bg-deep p-4 text-surface shadow-md">
+              <div className="flex items-center gap-3">
+                {searchInfo.matchedArtist.portraitPublicId ? (
+                  <img
+                    src={searchInfo.matchedArtist.portraitPublicId}
+                    alt={searchInfo.matchedArtist.displayName.he}
+                    className="h-12 w-12 rounded-full object-cover border-2 border-accent shrink-0"
+                  />
+                ) : (
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-accent text-surface font-bold text-h3">
+                    {searchInfo.matchedArtist.displayName.he.charAt(0)}
+                  </div>
+                )}
+                <div>
+                  <h3 className="text-small font-bold text-surface">
+                    <bdi>{searchInfo.matchedArtist.displayName.he}</bdi>
+                  </h3>
+                  <p className="text-caption text-surface/80">
+                    {searchInfo.matchedArtist.location.he} · {searchInfo.matchedArtist.bio.he.slice(0, 80)}...
+                  </p>
+                </div>
+              </div>
+
+              <Link
+                href={`/artists/${searchInfo.matchedArtist.slug}`}
+                className="hidden sm:inline-flex rounded-control bg-surface px-3.5 py-2 text-caption font-semibold text-text hover:bg-sand transition-colors shrink-0"
+              >
+                עבור לפרופיל האמן/ית ←
+              </Link>
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="mt-6 rounded-panel bg-sand p-4 md:p-6">
         <FilterPanel activeCount={activeFilterCount(filters)}>
@@ -122,6 +181,14 @@ function CatalogueView({
             </React.Fragment>
           ))}
         </ul>
+      ) : filters.search ? (
+        <SearchEmptyState
+          query={filters.search}
+          hasFilters={activeFilterCount(filters) > 0}
+          categories={searchInfo?.suggestions.categories || []}
+          artists={searchInfo?.suggestions.artists || []}
+          recommendedArtworks={allArtworks.slice(0, 6)}
+        />
       ) : (
         <EmptyState hasFilters={activeFilterCount(filters) > 0} sort={filters.sort} />
       )}

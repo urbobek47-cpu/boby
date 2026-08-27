@@ -4,6 +4,7 @@
  * (BUILD-PLAN Phase 1 task 5). No client state.
  */
 import type { Artwork, Discipline } from "./types";
+import { searchCatalog } from "./search";
 
 export type SortKey = "newest" | "price-asc" | "price-desc";
 
@@ -11,6 +12,7 @@ export type FilterParams = {
   category?: Discipline;
   price?: string; // a PRICE_BANDS key
   artist?: string; // artist slug
+  search?: string; // search text query
   sort: SortKey;
 };
 
@@ -46,6 +48,7 @@ export function parseFilters(
   const category = one(searchParams.category);
   const price = one(searchParams.price);
   const artist = one(searchParams.artist);
+  const search = one(searchParams.search);
   const sort = one(searchParams.sort);
 
   return {
@@ -54,17 +57,24 @@ export function parseFilters(
       : undefined,
     price: PRICE_BANDS.some((b) => b.key === price) ? price : undefined,
     artist: artist || undefined,
+    search: search || undefined,
     sort: SORTS.includes(sort as SortKey) ? (sort as SortKey) : "newest",
   };
 }
 
 /** Count of active facet filters (sort is not a filter). */
 export function activeFilterCount(f: FilterParams): number {
-  return [f.category, f.price, f.artist].filter(Boolean).length;
+  return [f.category, f.price, f.artist, f.search].filter(Boolean).length;
 }
 
 export function applyFilters(list: Artwork[], f: FilterParams): Artwork[] {
   let out = list;
+
+  // Apply intelligent search if search query is provided
+  if (f.search) {
+    const searchResult = searchCatalog(out, f.search);
+    out = searchResult.items;
+  }
 
   if (f.category) out = out.filter((a) => a.discipline === f.category);
   if (f.artist) out = out.filter((a) => a.artist.slug === f.artist);
