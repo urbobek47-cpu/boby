@@ -1,14 +1,13 @@
 /**
- * Flexible Hebrew Search & Intent Recognition Engine for BOBY (§C, §D).
+ * Strict & Flexible Hebrew Search & Intent Recognition Engine for BOBY (§C, §D).
  *
  * Capabilities:
- * - Hebrew Normalization: removes niqqud, normalizes final letters (ם->מ, ן->נ, ץ->צ, ף->פ, ך->כ),
- *   normalizes alef/vav/yod spellings and common Hebrew prefixes (ב-, כ-, ל-, מ-, ש-, וה-).
- * - Price Intent Extraction: parses explicit price expressions ("עד 300", "מתחת ל-200 שקל",
- *   "בין 500 ל 1000", "מעל 400") and applies agorot bounds automatically.
- * - Artist & Genre Intent Recognition: detects matching artists or category disciplines to show
- *   special feature banners and route recommendations.
- * - Empty Search Fallback Suggestions: returns alternative categories, artists, and recommendations.
+ * - Hebrew Normalization: removes niqqud, normalizes final letters (ם->מ, ן->נ, ץ->צ, ף->פ, ך->כ).
+ * - Prefix Stripping: strips common Hebrew prefixes (ב-, כ-, ל-, מ-, ש-, ו-) for token matching.
+ * - Price Intent Extraction: parses explicit price bounds ("עד 300", "מתחת ל-200 שקל", "בין 300 ל-1000", "מעל 400").
+ * - Artist & Genre Intent Recognition: detects matching artists or category disciplines.
+ * - Strict Boolean Filtering: ALL active constraints (Price AND Discipline AND Artist AND Keywords) must be satisfied.
+ *   If 0 items match, returns items = [] so SearchEmptyState handles fallback gracefully.
  */
 
 import type { Artwork, Artist, Discipline } from "./types";
@@ -61,7 +60,7 @@ const DISCIPLINE_MAP: Array<{ key: Discipline; he: string; synonyms: string[] }>
   {
     key: "wood",
     he: "עץ",
-    synonyms: ["עץ", "עבודת עץ", "חרטות עץ", "גילוף", "חריטה בעץ", "עץ טבעי"],
+    synonyms: ["עץ", "עבודת עץ", "חרטות עץ", "גילוף", "חריטה בעץ", "עץ טבעי", "אגוז", "זית"],
   },
   {
     key: "textile",
@@ -74,6 +73,8 @@ const DISCIPLINE_MAP: Array<{ key: Discipline; he: string; synonyms: string[] }>
     synonyms: ["יודאיקה", "פמוטים", "חזיה", "מזוזה", "מזוזות", "חג", "שבת", "קדושה", "חג ומועד"],
   },
 ];
+
+const STOP_WORDS = new Set(["של", "על", "עם", "את", "רוצה", "מחפש", "איפה", "איזה", "מה", "למי"]);
 
 /** Normalize Hebrew text by removing niqqud and converting final letters to standard form */
 export function normalizeHebrew(text: string): string {
@@ -91,12 +92,11 @@ export function normalizeHebrew(text: string): string {
     .trim();
 }
 
-/** Strip common Hebrew prefix letters (ב-, כ-, ל-, מ-, ש-, ו-) from a single word if word length > 3 */
-function stripHebrewPrefix(word: string): string {
+/** Strip common Hebrew prefix letters (ב-, כ-, ל-, מ-, ש-, ו-) if word length > 3 */
+export function stripHebrewPrefix(word: string): string {
   const norm = normalizeHebrew(word);
   if (norm.length <= 3) return norm;
 
-  // Strip prefixes like "וה", "מה", "לה", "ב"
   if (norm.startsWith("וה") || norm.startsWith("מה") || norm.startsWith("לה")) {
     return norm.slice(2);
   }
@@ -117,15 +117,15 @@ function stripHebrewPrefix(word: string): string {
 export function parsePriceIntent(query: string): PriceIntent | undefined {
   const norm = normalizeHebrew(query);
 
-  // Pattern 1: "בין X ל Y" or "מ-X עד Y" (e.g., "בין 500 ל 1000", "מ-300 עד 800")
-  const rangeMatch = norm.match(/(?:בין|מ-?)\s*(\d+)\s*(?:ל|עד|-)\s*(\d+)/i);
+  // Pattern 1: "בין X ל-Y" or "בינ X ל Y" or "מ-X עד Y" (e.g., "בין 300 ל 1000", "בין 300 ל-1000")
+  const rangeMatch = norm.match(/(?:בין|בינ|מ-?)\s*(\d+)\s*(?:ל-?|עד|-)\s*(\d+)/i);
   if (rangeMatch) {
     const minVal = parseInt(rangeMatch[1], 10);
     const maxVal = parseInt(rangeMatch[2], 10);
     if (!isNaN(minVal) && !isNaN(maxVal)) {
       const minAgorot = Math.min(minVal, maxVal) * 100;
       const maxAgorot = Math.max(minVal, maxVal) * 100;
-      const cleanedQuery = query.replace(new RegExp(rangeMatch[0], "gi"), "").trim();
+      const cleanedQuery = norm.replace(rangeMatch[0], "").trim();
       return {
         minAgorot,
         maxAgorot,
@@ -140,7 +140,7 @@ export function parsePriceIntent(query: string): PriceIntent | undefined {
   if (maxMatch) {
     const maxVal = parseInt(maxMatch[1], 10);
     if (!isNaN(maxVal)) {
-      const cleanedQuery = query.replace(new RegExp(maxMatch[0], "gi"), "").trim();
+      const cleanedQuery = norm.replace(maxMatch[0], "").trim();
       return {
         maxAgorot: maxVal * 100,
         label: `עד ₪${maxVal}`,
@@ -154,7 +154,7 @@ export function parsePriceIntent(query: string): PriceIntent | undefined {
   if (minMatch) {
     const minVal = parseInt(minMatch[1], 10);
     if (!isNaN(minVal)) {
-      const cleanedQuery = query.replace(new RegExp(minMatch[0], "gi"), "").trim();
+      const cleanedQuery = norm.replace(minMatch[0], "").trim();
       return {
         minAgorot: minVal * 100,
         label: `מעל ₪${minVal}`,
@@ -167,7 +167,7 @@ export function parsePriceIntent(query: string): PriceIntent | undefined {
 }
 
 /**
- * Intelligent Catalog Search Engine
+ * Strict Catalog Search Engine
  */
 export function searchCatalog(allArtworks: Artwork[], rawQuery: string): SearchResult {
   const query = rawQuery.trim();
@@ -186,49 +186,45 @@ export function searchCatalog(allArtworks: Artwork[], rawQuery: string): SearchR
 
   // 1. Parse Price Intent
   const priceIntent = parsePriceIntent(query);
-  const textQuery = priceIntent ? priceIntent.cleanedQuery : query;
+  const textQuery = (priceIntent ? priceIntent.cleanedQuery : query).trim();
   const normalizedText = normalizeHebrew(textQuery);
-  const words = normalizedText.split(/\s+/).filter(Boolean);
-  const strippedWords = words.map(stripHebrewPrefix);
 
-  // 2. Artist Recognition
+  // 2. Artist Intent Recognition
   let matchedArtist: Artist | undefined = undefined;
-  for (const artwork of allArtworks) {
-    const artist = artwork.artist;
-    const artistNameHe = normalizeHebrew(artist.displayName.he);
-    const artistNameEn = normalizeHebrew(artist.displayName.en);
-
-    const isMatch =
-      (normalizedText.length >= 2 && artistNameHe.includes(normalizedText)) ||
-      (normalizedText.length >= 2 && artistNameEn.includes(normalizedText)) ||
-      words.some((w) => artistNameHe.includes(w) || artistNameEn.includes(w));
-
-    if (isMatch) {
-      matchedArtist = artist;
-      break;
+  if (normalizedText.length >= 2) {
+    for (const artwork of allArtworks) {
+      const artist = artwork.artist;
+      const artistHe = normalizeHebrew(artist.displayName.he);
+      const artistEn = normalizeHebrew(artist.displayName.en);
+      if (artistHe.includes(normalizedText) || artistEn.includes(normalizedText) || normalizedText.includes(artistHe)) {
+        matchedArtist = artist;
+        break;
+      }
     }
   }
 
-  // 3. Category/Genre Recognition
+  // 3. Category / Discipline Intent Recognition
   let matchedDiscipline: { key: Discipline; heLabel: string } | undefined = undefined;
-  for (const disc of DISCIPLINE_MAP) {
-    const isCategoryMatch = disc.synonyms.some((syn) => {
-      const normSyn = normalizeHebrew(syn);
-      return (
-        normalizedText.includes(normSyn) ||
-        words.some((w) => w === normSyn || stripHebrewPrefix(w) === normSyn)
-      );
-    });
-
-    if (isCategoryMatch) {
-      matchedDiscipline = { key: disc.key, heLabel: disc.he };
-      break;
+  if (normalizedText.length >= 2) {
+    for (const disc of DISCIPLINE_MAP) {
+      const isMatch = disc.synonyms.some((syn) => {
+        const normSyn = normalizeHebrew(syn);
+        return normalizedText === normSyn || normalizedText.includes(normSyn) || normSyn.includes(normalizedText);
+      });
+      if (isMatch) {
+        matchedDiscipline = { key: disc.key, heLabel: disc.he };
+        break;
+      }
     }
   }
 
-  // 4. Artwork Filtering
-  let results = allArtworks.filter((artwork) => {
-    // Price Intent Filter
+  // Tokenize ONLY remaining text after price/artist/category parsing
+  const rawWords = normalizedText.split(/\s+/).filter(Boolean);
+  const tokens = rawWords.filter((w) => !STOP_WORDS.has(w) && w.length >= 2);
+
+  // 4. Strict Filtering over catalog
+  const filtered = allArtworks.filter((artwork) => {
+    // Constraint A: Price Intent Filter
     if (priceIntent) {
       if (priceIntent.minAgorot !== undefined && artwork.priceAgorot < priceIntent.minAgorot) {
         return false;
@@ -238,41 +234,46 @@ export function searchCatalog(allArtworks: Artwork[], rawQuery: string): SearchR
       }
     }
 
-    // If text query is empty after price parsing, return true for price match
-    if (!textQuery) return true;
-
-    // Check Artist Match
-    if (matchedArtist && artwork.artist.slug === matchedArtist.slug) {
-      return true;
+    // Constraint B: Matched Discipline Constraint
+    if (matchedDiscipline) {
+      if (artwork.discipline !== matchedDiscipline.key) {
+        return false;
+      }
     }
 
-    // Check Discipline Match
-    if (matchedDiscipline && artwork.discipline === matchedDiscipline.key) {
-      return true;
+    // Constraint C: Matched Artist Constraint
+    if (matchedArtist) {
+      if (artwork.artist.slug !== matchedArtist.slug) {
+        return false;
+      }
     }
 
-    // Check Keyword Title / Story / Materials Match
-    const titleHe = normalizeHebrew(artwork.title.he);
-    const titleEn = normalizeHebrew(artwork.title.en);
-    const storyHe = normalizeHebrew(artwork.story.he);
-    const artistNameHe = normalizeHebrew(artwork.artist.displayName.he);
+    // Constraint D: Keyword Matching Filter
+    if (tokens.length > 0) {
+      const categoryMatchWord = matchedDiscipline && tokens.some(t => matchedDiscipline.heLabel.includes(t) || t.includes(matchedDiscipline.heLabel));
+      const artistMatchWord = matchedArtist && tokens.some(t => normalizeHebrew(matchedArtist.displayName.he).includes(t));
 
-    const matchesKeyword = words.some((word) => {
-      const stripped = stripHebrewPrefix(word);
-      return (
-        titleHe.includes(word) ||
-        titleEn.includes(word) ||
-        storyHe.includes(word) ||
-        artistNameHe.includes(word) ||
-        titleHe.includes(stripped) ||
-        storyHe.includes(stripped)
-      );
-    });
+      if (!categoryMatchWord && !artistMatchWord) {
+        const titleHe = normalizeHebrew(artwork.title.he);
+        const titleEn = normalizeHebrew(artwork.title.en);
+        const storyHe = normalizeHebrew(artwork.story.he);
+        const categoryHe = normalizeHebrew(artwork.category.he);
+        const artistNameHe = normalizeHebrew(artwork.artist.displayName.he);
+        const materialsHe = artwork.materials.he.map(normalizeHebrew).join(" ");
+        const searchableText = `${titleHe} ${titleEn} ${storyHe} ${categoryHe} ${artistNameHe} ${materialsHe}`;
 
-    return matchesKeyword;
+        const allTokensMatch = tokens.every((token) => {
+          const stripped = stripHebrewPrefix(token);
+          return searchableText.includes(token) || (stripped.length >= 2 && searchableText.includes(stripped));
+        });
+        if (!allTokensMatch) return false;
+      }
+    }
+
+    return true;
   });
 
-  // Extract unique suggestions for fallback empty state
+  // Extract suggestions for empty fallback UI
   const categoriesList = DISCIPLINE_MAP.map((d) => ({ key: d.key, label: d.he }));
   const artistsListMap = new Map<string, { slug: string; name: string }>();
   for (const a of allArtworks) {
@@ -283,7 +284,7 @@ export function searchCatalog(allArtworks: Artwork[], rawQuery: string): SearchR
   }
 
   return {
-    items: results,
+    items: filtered,
     rawQuery: query,
     cleanedQuery: textQuery,
     matchedArtist,
