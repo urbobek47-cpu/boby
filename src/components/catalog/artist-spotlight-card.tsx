@@ -12,10 +12,10 @@ export function ArtistSpotlightCard({ artist }: ArtistSpotlightCardProps) {
   const bioQuote = artist.bio.he;
 
   return (
-    <div className="col-span-2 md:col-span-3 my-4 overflow-hidden rounded-panel border border-border bg-sand/50 p-6 md:p-8 shadow-sm transition-all hover:bg-sand/70">
+    <div className="col-span-2 md:col-span-3 my-4 md:my-6 overflow-hidden rounded-panel border border-stone/60 bg-sand/40 p-6 md:p-8 shadow-[var(--shadow-soft)] transition-all hover:bg-sand/60">
       <div className="flex flex-col md:flex-row md:items-center gap-6">
-        {/* Studio / Portrait Image */}
-        <div className="h-48 w-full md:h-56 md:w-72 shrink-0 overflow-hidden rounded-card bg-stone/40 relative">
+        {/* Studio / Portrait Image Bed */}
+        <div className="h-48 w-full md:h-56 md:w-72 shrink-0 overflow-hidden rounded-card bg-stone/30 relative">
           {artist.portraitPublicId ? (
             <img
               src={artist.portraitPublicId}
@@ -27,15 +27,15 @@ export function ArtistSpotlightCard({ artist }: ArtistSpotlightCardProps) {
               🎨
             </div>
           )}
-          <span className="absolute start-3 top-3 rounded-full bg-deep/80 px-3 py-1 text-caption font-semibold text-surface">
+          <span className="absolute start-3 top-3 rounded-full bg-deep/85 px-3 py-1 text-caption font-medium text-surface backdrop-blur-sm">
             סיפור אמן
           </span>
         </div>
 
-        {/* Narrative & Quote */}
-        <div className="flex flex-col gap-3 flex-1 text-start">
-          <div className="flex items-center gap-2">
-            <h4 className="text-h3 font-semibold text-text">
+        {/* Narrative & Editorial Quote */}
+        <div className="flex flex-col gap-3.5 flex-1 text-start">
+          <div className="flex items-baseline gap-2">
+            <h4 className="text-h3 md:text-h2 font-medium text-text">
               <bdi>{name}</bdi>
             </h4>
             <span className="text-caption text-text-muted">· {location}</span>
@@ -45,10 +45,10 @@ export function ArtistSpotlightCard({ artist }: ArtistSpotlightCardProps) {
             &quot;{bioQuote}&quot;
           </blockquote>
 
-          <div className="mt-2">
+          <div className="mt-1">
             <Link
               href={`/artists/${artist.slug}`}
-              className="inline-flex items-center gap-1 text-small font-medium text-accent-strong hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-strong rounded-control px-1"
+              className="inline-flex items-center gap-1.5 text-small font-medium text-accent-strong hover:text-accent-hover transition-colors focus-visible:outline-none rounded-control py-1"
             >
               <span>לגילוי כל היצירות של <bdi>{name}</bdi> ←</span>
             </Link>
