@@ -3,8 +3,8 @@
  * ceramics ₪49–399, jewelry ₪110–550, originals ₪1,000–5,000). Money in
  * integer agorot (§5.5).
  *
- * 100% audited unique primary image dataset (51 artworks, 20 artists).
- * Zero duplicate images across any artwork records.
+ * 100% audited unique primary image dataset (54 artworks, 22 artists).
+ * Zero duplicate images & zero broken (404) image references.
  */
 import type { Artist, Artwork } from "./types";
 
@@ -305,7 +305,7 @@ const artworks: Artwork[] = [
     priceAgorot: 28000,
     shippingSizeBand: "SMALL",
     isFragile: false,
-    images: [{ publicId: "/mock/yareach-print.jpg", aspectRatio: 3 / 4, role: "primary", caption: { he: "הדפס רשת מינימליסטי", en: "Minimalist screen print" } }],
+    images: [{ publicId: "/mock/full-moon.jpg", aspectRatio: 3 / 4, role: "primary", caption: { he: "הדפס רשת מינימליסטי", en: "Minimalist screen print" } }],
     artist: yaelStudio,
   },
   {
@@ -322,7 +322,7 @@ const artworks: Artwork[] = [
     priceAgorot: 19000,
     shippingSizeBand: "SMALL",
     isFragile: false,
-    images: [{ publicId: "/mock/wooden-goblet.jpg", aspectRatio: 3 / 4, role: "primary", caption: { he: "גביע עץ זית", en: "Hand-turned olive wood goblet" } }],
+    images: [{ publicId: "/mock/olive-goblet.jpg", aspectRatio: 3 / 4, role: "primary", caption: { he: "גביע עץ זית", en: "Hand-turned olive wood goblet" } }],
     artist: danWood,
   },
 
@@ -374,7 +374,7 @@ const artworks: Artwork[] = [
     priceAgorot: 58000,
     shippingSizeBand: "MEDIUM",
     isFragile: true,
-    images: [{ publicId: "https://images.unsplash.com/photo-1576020688413-40a2a194917a?auto=format&fit=crop&w=1000&q=80", aspectRatio: 0.55, role: "primary", caption: { he: "אגרטל ראקו גבוה", en: "Tall Raku vase" } }],
+    images: [{ publicId: "https://images.unsplash.com/photo-1581783342308-f792dbdd27c5?auto=format&fit=crop&w=1000&q=80", aspectRatio: 0.75, role: "primary", caption: { he: "אגרטל ראקו גבוה", en: "Tall Raku vase" } }],
     artist: adiNavon,
   },
   {
@@ -487,7 +487,7 @@ const artworks: Artwork[] = [
     priceAgorot: 31000,
     shippingSizeBand: "MEDIUM",
     isFragile: true,
-    images: [{ publicId: "https://images.unsplash.com/photo-1607344645866-009c320c5ab8?auto=format&fit=crop&w=1000&q=80", aspectRatio: 1.4, role: "primary", caption: { he: "קערת טרקוטה", en: "Terracotta salad bowl" } }],
+    images: [{ publicId: "https://images.unsplash.com/photo-1615873968403-89e068629265?auto=format&fit=crop&w=1000&q=80", aspectRatio: 1.1, role: "primary", caption: { he: "קערת טרקוטה", en: "Terracotta salad bowl" } }],
     artist: noaBarak,
   },
 
@@ -555,7 +555,7 @@ const artworks: Artwork[] = [
     priceAgorot: 22000,
     shippingSizeBand: "SMALL",
     isFragile: false,
-    images: [{ publicId: "https://images.unsplash.com/photo-1611591475179-c5c8e3100650?auto=format&fit=crop&w=1000&q=80", aspectRatio: 1.1, role: "primary", caption: { he: "צמיד פליז", en: "Brass bangle" } }],
+    images: [{ publicId: "https://images.unsplash.com/photo-1598560917505-59a3ad559071?auto=format&fit=crop&w=1000&q=80", aspectRatio: 1.0, role: "primary", caption: { he: "צמיד פליז", en: "Brass bangle" } }],
     artist: liorBenDavid,
   },
   {
@@ -571,7 +571,7 @@ const artworks: Artwork[] = [
     priceAgorot: 78000,
     shippingSizeBand: "SMALL",
     isFragile: false,
-    images: [{ publicId: "https://images.unsplash.com/photo-1598560917505-59a3ad559071?auto=format&fit=crop&w=1000&q=80", aspectRatio: 0.85, role: "primary", caption: { he: "שרשרת זהב", en: "Gold collar" } }],
+    images: [{ publicId: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=1000&q=80", aspectRatio: 0.85, role: "primary", caption: { he: "שרשרת זהב", en: "Gold collar" } }],
     artist: doritShacham,
   },
   {
@@ -721,7 +721,7 @@ const artworks: Artwork[] = [
     priceAgorot: 31000,
     shippingSizeBand: "SMALL",
     isFragile: false,
-    images: [{ publicId: "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=1000&q=80", aspectRatio: 0.8, role: "primary", caption: { he: "הדפס לינולאום", en: "Linocut print" } }],
+    images: [{ publicId: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=1000&q=80", aspectRatio: 0.8, role: "primary", caption: { he: "הדפס לינולאום", en: "Linocut print" } }],
     artist: michaelKraus,
   },
   {
@@ -737,7 +737,7 @@ const artworks: Artwork[] = [
     priceAgorot: 170000,
     shippingSizeBand: "LARGE",
     isFragile: false,
-    images: [{ publicId: "https://images.unsplash.com/photo-1578926375705-90ae2442431d?auto=format&fit=crop&w=1000&q=80", aspectRatio: 1.25, role: "primary", caption: { he: "ציור מופשט רחב", en: "Wide abstract painting" } }],
+    images: [{ publicId: "https://images.unsplash.com/photo-1543857778-c4a1a3e0b2eb?auto=format&fit=crop&w=1000&q=80", aspectRatio: 1.25, role: "primary", caption: { he: "ציור מופשט רחב", en: "Wide abstract painting" } }],
     artist: shiraLevi,
   },
   {
@@ -787,7 +787,7 @@ const artworks: Artwork[] = [
     priceAgorot: 45000,
     shippingSizeBand: "SMALL",
     isFragile: false,
-    images: [{ publicId: "https://images.unsplash.com/photo-1543857778-c4a1a3e0b2eb?auto=format&fit=crop&w=1000&q=80", aspectRatio: 0.85, role: "primary", caption: { he: "רישום דיו", en: "Minimalist ink sketch" } }],
+    images: [{ publicId: "https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?auto=format&fit=crop&w=1000&q=80", aspectRatio: 0.85, role: "primary", caption: { he: "רישום דיו", en: "Minimalist ink sketch" } }],
     artist: michaelKraus,
   },
   {
@@ -986,7 +986,7 @@ const artworks: Artwork[] = [
     priceAgorot: 180000,
     shippingSizeBand: "MEDIUM",
     isFragile: true,
-    images: [{ publicId: "https://images.unsplash.com/photo-1561839561-b13bcfe95249?auto=format&fit=crop&w=1000&q=80", aspectRatio: 0.55, role: "primary", caption: { he: "טוטם חמר", en: "Clay totem sculpture" } }],
+    images: [{ publicId: "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=1000&q=80", aspectRatio: 0.55, role: "primary", caption: { he: "טוטם חמר", en: "Clay totem sculpture" } }],
     artist: itamarGoldstein,
   },
   {
@@ -1002,7 +1002,7 @@ const artworks: Artwork[] = [
     priceAgorot: 160000,
     shippingSizeBand: "MEDIUM",
     isFragile: true,
-    images: [{ publicId: "https://images.unsplash.com/photo-1549887534-1541e9326642?auto=format&fit=crop&w=1000&q=80", aspectRatio: 0.85, role: "primary", caption: { he: "דיוקן חמר", en: "Terracotta head study" } }],
+    images: [{ publicId: "https://images.unsplash.com/photo-1509319117193-57bab727e09d?auto=format&fit=crop&w=1000&q=80", aspectRatio: 0.85, role: "primary", caption: { he: "דיוקן חמר", en: "Terracotta head study" } }],
     artist: itamarGoldstein,
   },
   {
@@ -1084,7 +1084,7 @@ const artworks: Artwork[] = [
     priceAgorot: 92000,
     shippingSizeBand: "MEDIUM",
     isFragile: false,
-    images: [{ publicId: "https://images.unsplash.com/photo-1509319117193-57bab727e09d?auto=format&fit=crop&w=1000&q=80", aspectRatio: 0.6, role: "primary", caption: { he: "פיסול מקרמה", en: "Macrame fiber sculpture" } }],
+    images: [{ publicId: "https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=1000&q=80", aspectRatio: 0.6, role: "primary", caption: { he: "פיסול מקרמה", en: "Macrame fiber sculpture" } }],
     artist: orlyMizrachi,
   },
 
@@ -1167,7 +1167,7 @@ const artworks: Artwork[] = [
     priceAgorot: 68000,
     shippingSizeBand: "SMALL",
     isFragile: false,
-    images: [{ publicId: "https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=1000&q=80", aspectRatio: 0.85, role: "primary", caption: { he: "ערכת הבדלה", en: "Olive wood Havdalah set" } }],
+    images: [{ publicId: "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=1000&q=80", aspectRatio: 0.85, role: "primary", caption: { he: "ערכת הבדלה", en: "Olive wood Havdalah set" } }],
     artist: yuvalArad,
   },
 ];

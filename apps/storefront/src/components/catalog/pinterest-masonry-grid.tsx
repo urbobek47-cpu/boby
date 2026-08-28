@@ -28,7 +28,7 @@ export function PinterestMasonryGrid({ artworks }: PinterestMasonryGridProps) {
             className="break-inside-avoid group relative overflow-hidden rounded-artwork bg-surface shadow-[var(--shadow-soft)] transition-all duration-300 hover:shadow-md border border-stone/40"
           >
             <Link
-              href={`/artists/${artist.slug}`}
+              href={`/works/${artwork.slug}`}
               className="block w-full focus-visible:outline-none"
             >
               {/* Image Container with Natural Aspect Ratio Bed */}
@@ -92,9 +92,12 @@ export function PinterestMasonryGrid({ artworks }: PinterestMasonryGridProps) {
                       </div>
                     </div>
 
-                    <span className="text-caption font-medium text-text bg-surface border border-stone/40 px-2.5 py-1 rounded-control shadow-sm shrink-0 hover:bg-sand transition-colors">
+                    <Link
+                      href={`/artists/${artist.slug}`}
+                      className="text-caption font-medium text-text bg-surface border border-stone/40 px-2.5 py-1 rounded-control shadow-sm shrink-0 hover:bg-sand transition-colors"
+                    >
                       צפה בסטודיו ←
-                    </span>
+                    </Link>
                   </div>
                 </div>
               </div>

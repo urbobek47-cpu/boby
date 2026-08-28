@@ -4,7 +4,7 @@ import { setRequestLocale } from "next-intl/server";
 import { useLocale, useTranslations } from "next-intl";
 import { routing, type Locale } from "@/i18n/routing";
 import { Link } from "@/i18n/navigation";
-import { getArtworkBySlug, listArtworkSlugs } from "@/lib/catalog/data";
+import { getArtworkBySlug, listArtworkSlugs, listArtworksByArtist } from "@/lib/catalog/data";
 import type { Artwork } from "@/lib/catalog/types";
 import { buildCloudinaryUrl } from "@/lib/cloudinary";
 import { seoAlternates, localePath } from "@/lib/site";
@@ -12,6 +12,7 @@ import { BreadcrumbJsonLd } from "@/components/seo/breadcrumb-jsonld";
 import { ArtworkGallery, type GalleryImage } from "@/components/artwork/artwork-gallery";
 import { PurchasePanel } from "@/components/artwork/purchase-panel";
 import { ArtistCard } from "@/components/artwork/artist-card";
+import { ArtworkCard } from "@/components/catalog/artwork-card";
 
 import { hasLocale } from "next-intl";
 
@@ -61,10 +62,13 @@ export default async function ArtworkPage({
   const artwork = await getArtworkBySlug(slug);
   if (!artwork) notFound();
 
-  return <ArtworkDetail artwork={artwork} />;
+  const allArtistWorks = await listArtworksByArtist(artwork.artist.slug);
+  const otherArtworks = allArtistWorks.filter((a) => a.slug !== artwork.slug);
+
+  return <ArtworkDetail artwork={artwork} otherArtworks={otherArtworks} />;
 }
 
-function ArtworkDetail({ artwork }: { artwork: Artwork }) {
+function ArtworkDetail({ artwork, otherArtworks }: { artwork: Artwork; otherArtworks: Artwork[] }) {
   const locale = useLocale() as Locale;
   const t = useTranslations("Artwork");
   const bc = useTranslations("Breadcrumb");
@@ -145,6 +149,19 @@ function ArtworkDetail({ artwork }: { artwork: Artwork }) {
             <ArtistCard artist={artwork.artist} />
           </div>
         </section>
+
+        {otherArtworks.length > 0 && (
+          <section className="pt-6 border-t border-border">
+            <h2 className="text-h2 font-medium text-text mb-6">
+              עוד יצירות מאת <bdi>{artistName}</bdi>
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+              {otherArtworks.map((other) => (
+                <ArtworkCard key={other.slug} artwork={other} />
+              ))}
+            </div>
+          </section>
+        )}
       </div>
 
       <ArtworkJsonLd artwork={artwork} locale={locale} />
