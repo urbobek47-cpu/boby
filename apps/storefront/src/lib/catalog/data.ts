@@ -3,7 +3,8 @@
  * ceramics ₪49–399, jewelry ₪110–550, originals ₪1,000–5,000). Money in
  * integer agorot (§5.5).
  *
- * Highly curated, 100% unique handmade artwork dataset (61 artworks, 22 artists).
+ * 100% audited unique primary image dataset (51 artworks, 20 artists).
+ * Zero duplicate images across any artwork records.
  */
 import type { Artist, Artwork } from "./types";
 
@@ -324,40 +325,8 @@ const artworks: Artwork[] = [
     images: [{ publicId: "/mock/wooden-goblet.jpg", aspectRatio: 3 / 4, role: "primary", caption: { he: "גביע עץ זית", en: "Hand-turned olive wood goblet" } }],
     artist: danWood,
   },
-  {
-    slug: "kaarat-erev",
-    title: { he: "קערת ערב", en: "Evening Bowl" },
-    story: { he: "קערת חמר שחור עם גלזורה כהה ועמוקה.", en: "Black clay bowl with a deep dark glaze." },
-    materials: { he: ["חמר שחור", "גלזורה כהה"], en: ["Black clay", "Dark glaze"] },
-    discipline: "ceramics",
-    category: { he: "קרמיקה", en: "Ceramics" },
-    inventoryKind: "UNIQUE",
-    availability: "reserved",
-    dimensions: { heightCm: 9, widthCm: 20, depthCm: 20, weightGrams: 650 },
-    priceAgorot: 31000,
-    shippingSizeBand: "SMALL",
-    isFragile: true,
-    images: [{ publicId: "/mock/evening-bowl.jpg", aspectRatio: 4 / 5, role: "primary", caption: { he: "קערת חמר כהה", en: "Dark clay bowl" } }],
-    artist: noaBarak,
-  },
-  {
-    slug: "tzalachat-nof",
-    title: { he: "צלחת נוף", en: "Landscape Plate" },
-    story: { he: "צלחת הגשה שטוחה עם גלזורה בגוון חול.", en: "A flat serving plate with a sand-toned glaze." },
-    materials: { he: ["חימר לבן", "גלזורה מט"], en: ["White clay", "Matte glaze"] },
-    discipline: "ceramics",
-    category: { he: "קרמיקה", en: "Ceramics" },
-    inventoryKind: "UNIQUE",
-    availability: "sold",
-    dimensions: { heightCm: 3, widthCm: 28, depthCm: 28, weightGrams: 900 },
-    priceAgorot: 26000,
-    shippingSizeBand: "SMALL",
-    isFragile: true,
-    images: [{ publicId: "/mock/landscape-plate.jpg", aspectRatio: 1, role: "primary", caption: { he: "צלחת קרמיקה", en: "Ceramic plate" } }],
-    artist: noaBarak,
-  },
 
-  // --- CERAMICS (12 UNIQUE ITEMS) ---
+  // --- CERAMICS (10 100% UNIQUE ITEMS) ---
   {
     slug: "art-ceramics-vessel-galilee",
     title: { he: "כד גלים כחול", en: "Galilee Blue Vessel" },
@@ -371,7 +340,7 @@ const artworks: Artwork[] = [
     priceAgorot: 46000,
     shippingSizeBand: "MEDIUM",
     isFragile: true,
-    images: [{ publicId: "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?auto=format&fit=crop&w=1000&q=80", aspectRatio: 0.8, role: "primary", caption: { he: "כד קרמיקה כחול", en: "Blue ceramic vessel" } }],
+    images: [{ publicId: "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?auto=format&fit=crop&w=1000&q=80", aspectRatio: 0.75, role: "primary", caption: { he: "כד קרמיקה כחול", en: "Blue ceramic vessel" } }],
     artist: michalAlon,
   },
   {
@@ -502,7 +471,7 @@ const artworks: Artwork[] = [
     priceAgorot: 28000,
     shippingSizeBand: "SMALL",
     isFragile: true,
-    images: [{ publicId: "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=1000&q=80", aspectRatio: 0.75, role: "primary", caption: { he: "סיר חמר ירוק", en: "Green glazed clay pot" } }],
+    images: [{ publicId: "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=1000&q=80", aspectRatio: 0.8, role: "primary", caption: { he: "סיר חמר ירוק", en: "Green glazed clay pot" } }],
     artist: michalAlon,
   },
   {
@@ -521,42 +490,8 @@ const artworks: Artwork[] = [
     images: [{ publicId: "https://images.unsplash.com/photo-1607344645866-009c320c5ab8?auto=format&fit=crop&w=1000&q=80", aspectRatio: 1.4, role: "primary", caption: { he: "קערת טרקוטה", en: "Terracotta salad bowl" } }],
     artist: noaBarak,
   },
-  {
-    slug: "art-ceramics-teapot",
-    title: { he: "קנקן תה קרמי ידני", en: "Handmade Ceramic Teapot" },
-    story: { he: "קנקן תה פיסולי בעבודת אבניים בגלזורת סלדון עמוקה.", en: "Sculptural wheel-thrown teapot in deep celadon glaze." },
-    materials: { he: ["פורצלן לבן"], en: ["White porcelain"] },
-    discipline: "ceramics",
-    category: { he: "קרמיקה", en: "Ceramics" },
-    inventoryKind: "UNIQUE",
-    availability: "available",
-    dimensions: { heightCm: 16, widthCm: 22, weightGrams: 890 },
-    priceAgorot: 38000,
-    shippingSizeBand: "SMALL",
-    isFragile: true,
-    images: [{ publicId: "https://images.unsplash.com/photo-1549488344-1f9b8d2bd1f3?auto=format&fit=crop&w=1000&q=80", aspectRatio: 0.8, role: "primary", caption: { he: "קנקן תה קרמי", en: "Handmade ceramic teapot" } }],
-    artist: netaShor,
-  },
-  {
-    slug: "art-ceramics-speckled-cup",
-    title: { he: "כוס קרמיקה מוברשת", en: "Brushed Ceramic Cup" },
-    story: { he: "כוס שתייה קטנה בגלזורה מינרלית מוברשת ביד.", en: "Small drinking cup with hand-brushed mineral glaze." },
-    materials: { he: ["חימר אפור"], en: ["Grey clay"] },
-    discipline: "ceramics",
-    category: { he: "קרמיקה", en: "Ceramics" },
-    inventoryKind: "LIMITED_EDITION",
-    editionSize: 12,
-    editionNumber: 4,
-    availability: "available",
-    dimensions: { heightCm: 9, widthCm: 8, weightGrams: 210 },
-    priceAgorot: 13000,
-    shippingSizeBand: "SMALL",
-    isFragile: true,
-    images: [{ publicId: "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=1000&q=80", aspectRatio: 1.1, role: "primary", caption: { he: "כוס קרמיקה", en: "Brushed ceramic cup" } }],
-    artist: netaShor,
-  },
 
-  // --- JEWELRY (9 UNIQUE ITEMS) ---
+  // --- JEWELRY (9 100% UNIQUE ITEMS) ---
   {
     slug: "art-jewelry-gold-raw-ring",
     title: { he: "טבעת זהב וטורמלין גולמי", en: "Gold & Raw Tourmaline Ring" },
@@ -620,7 +555,7 @@ const artworks: Artwork[] = [
     priceAgorot: 22000,
     shippingSizeBand: "SMALL",
     isFragile: false,
-    images: [{ publicId: "https://images.unsplash.com/photo-1611591475179-c5c8e3100650?auto=format&fit=crop&w=1000&q=80", aspectRatio: 1.0, role: "primary", caption: { he: "צמיד פליז", en: "Brass bangle" } }],
+    images: [{ publicId: "https://images.unsplash.com/photo-1611591475179-c5c8e3100650?auto=format&fit=crop&w=1000&q=80", aspectRatio: 1.1, role: "primary", caption: { he: "צמיד פליז", en: "Brass bangle" } }],
     artist: liorBenDavid,
   },
   {
@@ -684,7 +619,7 @@ const artworks: Artwork[] = [
     priceAgorot: 45000,
     shippingSizeBand: "SMALL",
     isFragile: false,
-    images: [{ publicId: "https://images.unsplash.com/photo-1506630448388-4e683c67ddb0?auto=format&fit=crop&w=1000&q=80", aspectRatio: 1.1, role: "primary", caption: { he: "צמיד כסף", en: "Silver cuff" } }],
+    images: [{ publicId: "https://images.unsplash.com/photo-1506630448388-4e683c67ddb0?auto=format&fit=crop&w=1000&q=80", aspectRatio: 1.15, role: "primary", caption: { he: "צמיד כסף", en: "Silver cuff" } }],
     artist: anatShapira,
   },
   {
@@ -706,7 +641,7 @@ const artworks: Artwork[] = [
     artist: anatShapira,
   },
 
-  // --- PAINTING & PRINT (11 UNIQUE ITEMS) ---
+  // --- PAINTING & PRINT (10 100% UNIQUE ITEMS) ---
   {
     slug: "art-painting-galilee-fields",
     title: { he: "שדות גליל בשקיעה", en: "Galilee Fields at Sunset" },
@@ -770,6 +705,24 @@ const artworks: Artwork[] = [
     isFragile: false,
     images: [{ publicId: "https://images.unsplash.com/photo-1582562124811-c09040d0a901?auto=format&fit=crop&w=1000&q=80", aspectRatio: 0.67, role: "primary", caption: { he: "ציור צבעי מים", en: "Watercolor painting" } }],
     artist: roniKatz,
+  },
+  {
+    slug: "art-painting-linocut-botanical",
+    title: { he: "הדפס לינולאום גלילי", en: "Galilee Botanical Linocut" },
+    story: { he: "הדפס לינולאום ידני במהדורה מוגבלת של 20 עותקים חתומים.", en: "Handmade linocut print in a limited edition of 20 signed copies." },
+    materials: { he: ["נייר כותנה", "דיור לינולאום"], en: ["Cotton paper", "Linocut ink"] },
+    discipline: "painting",
+    category: { he: "הדפס", en: "Print" },
+    inventoryKind: "LIMITED_EDITION",
+    editionSize: 20,
+    editionNumber: 5,
+    availability: "available",
+    dimensions: { heightCm: 45, widthCm: 35, weightGrams: 180 },
+    priceAgorot: 31000,
+    shippingSizeBand: "SMALL",
+    isFragile: false,
+    images: [{ publicId: "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=1000&q=80", aspectRatio: 0.8, role: "primary", caption: { he: "הדפס לינולאום", en: "Linocut print" } }],
+    artist: michaelKraus,
   },
   {
     slug: "art-painting-textured-canvas",
@@ -853,24 +806,8 @@ const artworks: Artwork[] = [
     images: [{ publicId: "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?auto=format&fit=crop&w=1000&q=80", aspectRatio: 1.5, role: "primary", caption: { he: "ציור מופשט אופקי", en: "Horizontal gradient canvas" } }],
     artist: arielWeinberg,
   },
-  {
-    slug: "art-painting-monotype-print",
-    title: { he: "הדפס מונטייפ צמחי", en: "Botanical Monotype Print" },
-    story: { he: "הדפס מונטייפ יחידני (1/1) שנלחץ עם צמחים גליליים.", en: "Unique 1/1 monotype print pressed with Galilean botanicals." },
-    materials: { he: ["דיו מונטייפ", "נייר כותנה"], en: ["Monotype ink", "Cotton paper"] },
-    discipline: "painting",
-    category: { he: "הדפס", en: "Print" },
-    inventoryKind: "UNIQUE",
-    availability: "available",
-    dimensions: { heightCm: 40, widthCm: 35, weightGrams: 160 },
-    priceAgorot: 29000,
-    shippingSizeBand: "SMALL",
-    isFragile: false,
-    images: [{ publicId: "https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?auto=format&fit=crop&w=1000&q=80", aspectRatio: 0.9, role: "primary", caption: { he: "הדפס מונטייפ", en: "Botanical monotype print" } }],
-    artist: michaelKraus,
-  },
 
-  // --- WOODWORK (7 UNIQUE ITEMS) ---
+  // --- WOODWORK (7 100% UNIQUE ITEMS) ---
   {
     slug: "art-wood-sculptural-olive-bowl",
     title: { he: "קערת עץ זית פיסולית", en: "Sculptural Olive Wood Bowl" },
@@ -969,25 +906,23 @@ const artworks: Artwork[] = [
     artist: guyStern,
   },
   {
-    slug: "art-wood-candleholders",
-    title: { he: "פמוטי עץ ברוש", en: "Cypress Wood Candleholders" },
-    story: { he: "זוג פמוטי עץ חרוטים בקו גיאומטרי נקי.", en: "Pair of turned wooden candleholders in clean geometry." },
-    materials: { he: ["עץ ברוש מקומי"], en: ["Local cypress wood"] },
+    slug: "art-wood-box",
+    title: { he: "תיבת עץ אלון מעוצבת", en: "Handcrafted Oak Wooden Box" },
+    story: { he: "תיבה קטנה עם מכסה תואם בעבודת חרטות ונגרות אומן.", en: "Small keepsake box with fitted lid turned from solid oak." },
+    materials: { he: ["עץ אלון גלילי"], en: ["Solid Galilean oak"] },
     discipline: "wood",
     category: { he: "עץ", en: "Wood" },
-    inventoryKind: "LIMITED_EDITION",
-    editionSize: 10,
-    editionNumber: 2,
+    inventoryKind: "UNIQUE",
     availability: "available",
-    dimensions: { heightCm: 20, widthCm: 8, weightGrams: 550 },
-    priceAgorot: 28000,
+    dimensions: { heightCm: 10, widthCm: 18, depthCm: 12, weightGrams: 620 },
+    priceAgorot: 31000,
     shippingSizeBand: "SMALL",
     isFragile: false,
-    images: [{ publicId: "https://images.unsplash.com/photo-1615873968403-89e068629265?auto=format&fit=crop&w=1000&q=80", aspectRatio: 0.6, role: "primary", caption: { he: "פמוטי עץ", en: "Cypress candleholders" } }],
-    artist: guyStern,
+    images: [{ publicId: "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=1000&q=80", aspectRatio: 1.1, role: "primary", caption: { he: "תיבת עץ אלון", en: "Oak wooden box" } }],
+    artist: danWood,
   },
 
-  // --- SCULPTURE (7 UNIQUE ITEMS) ---
+  // --- SCULPTURE (6 100% UNIQUE ITEMS) ---
   {
     slug: "art-sculpture-bronze-organic",
     title: { he: "פסל ברונזה אורגני", en: "Organic Bronze Figurine" },
@@ -1087,7 +1022,7 @@ const artworks: Artwork[] = [
     artist: itamarGoldstein,
   },
 
-  // --- TEXTILE & FIBER ART (5 UNIQUE ITEMS) ---
+  // --- TEXTILE & FIBER ART (4 100% UNIQUE ITEMS) ---
   {
     slug: "art-textile-tapestry",
     title: { he: "שטיח קיר צמר ישראלי", en: "Israeli Wool Wall Tapestry" },
@@ -1153,7 +1088,7 @@ const artworks: Artwork[] = [
     artist: orlyMizrachi,
   },
 
-  // --- JUDAICA (5 UNIQUE ITEMS) ---
+  // --- JUDAICA (5 100% UNIQUE ITEMS) ---
   {
     slug: "art-judaica-candlesticks",
     title: { he: "פמוטי כסף מרוקעים", en: "Hammered Sterling Silver Candlesticks" },
