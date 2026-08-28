@@ -46,8 +46,8 @@ export function PinterestMasonryGrid({ artworks }: PinterestMasonryGridProps) {
                   </div>
                 )}
 
-                {/* Mobile Bottom Overlay (Minimalist & Bidi-safe) */}
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-deep/85 via-deep/40 to-transparent p-2.5 text-surface md:hidden">
+                {/* Mobile Bottom Overlay (Always visible on mobile) */}
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/35 to-transparent p-2.5 text-surface md:hidden">
                   <div className="flex items-center gap-2">
                     {artist.portraitPublicId && (
                       <img
@@ -67,9 +67,9 @@ export function PinterestMasonryGrid({ artworks }: PinterestMasonryGridProps) {
                   </div>
                 </div>
 
-                {/* Desktop Hover Info Overlay - Editorial Gallery Feeling */}
-                <div className="absolute inset-x-0 bottom-0 hidden md:flex flex-col justify-end bg-gradient-to-t from-deep/90 via-deep/35 to-transparent p-3.5 opacity-0 transition-opacity duration-300 group-hover:opacity-100 text-surface">
-                  <div className="flex items-center justify-between gap-2">
+                {/* Desktop Hover Info Overlay - Bottom-only gradient, artwork remains 100% visible */}
+                <div className="absolute inset-x-0 bottom-0 hidden md:flex flex-col justify-end bg-gradient-to-t from-black/80 via-black/30 to-transparent pt-12 pb-3.5 px-3.5 opacity-0 transition-opacity duration-300 group-hover:opacity-100 text-surface pointer-events-none">
+                  <div className="flex items-center justify-between gap-2 pointer-events-auto">
                     <div className="flex items-center gap-2.5 min-w-0">
                       {artist.portraitPublicId ? (
                         <img
