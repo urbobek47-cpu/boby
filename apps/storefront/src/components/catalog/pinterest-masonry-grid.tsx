@@ -6,6 +6,7 @@ import type { Locale } from "@/i18n/routing";
 import { Link } from "@/i18n/navigation";
 import type { Artwork } from "@/lib/catalog/types";
 import { Price } from "@/components/catalog/price";
+import { LikeButton } from "@/components/ui/like-button";
 
 interface PinterestMasonryGridProps {
   artworks: Artwork[];
@@ -45,8 +46,11 @@ export function PinterestMasonryGrid({ artworks }: PinterestMasonryGridProps) {
               href={`/works/${artwork.slug}`}
               className="block w-full focus-visible:outline-none"
             >
-              {/* Image Container with Natural Aspect Ratio Bed */}
-              <div className="relative w-full overflow-hidden bg-sand/40">
+                {/* Floating Like Button */}
+                <div className="absolute top-2.5 end-2.5 z-20">
+                  <LikeButton slug={artwork.slug} title={artworkTitle} />
+                </div>
+
                 {cardImgSrc ? (
                   <img
                     src={cardImgSrc}

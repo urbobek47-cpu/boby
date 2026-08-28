@@ -6,6 +6,7 @@ import { formatDimensions, formatWeight } from "@/lib/format";
 import { Price } from "@/components/catalog/price";
 import { AvailabilityBadge } from "@/components/catalog/availability-badge";
 import { Button } from "@/components/ui/button";
+import { LikeButton } from "@/components/ui/like-button";
 
 /**
  * The purchase panel (design brief screen 3). On desktop it sticks and shows,
@@ -53,9 +54,12 @@ export function PurchasePanel({ artwork }: { artwork: Artwork }) {
         </p>
       </div>
 
-      <div className="flex flex-col gap-1">
-        <Price agorot={artwork.priceAgorot} className="text-[1.75rem] font-semibold md:text-[2rem]" />
-        <span className="text-caption text-text-muted">{t("vatIncluded")}</span>
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex flex-col gap-1">
+          <Price agorot={artwork.priceAgorot} className="text-[1.75rem] font-semibold md:text-[2rem]" />
+          <span className="text-caption text-text-muted">{t("vatIncluded")}</span>
+        </div>
+        <LikeButton slug={artwork.slug} title={artwork.title[locale]} variant="inline" />
       </div>
 
       <dl className="flex flex-col divide-y divide-border border-y border-border">
