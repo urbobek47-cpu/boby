@@ -86,13 +86,11 @@ function ArtworkDetail({ artwork, otherArtworks }: { artwork: Artwork; otherArtw
     thumbLabel: t("gallery.thumbLabel", { n: i + 1 }),
   }));
 
-  const scaleImage = artwork.images.find((i) => i.role === "scale");
-
   return (
     <main className="mx-auto max-w-[var(--container-content)] px-6 py-8 md:px-12 md:py-12 lg:px-16">
       <Breadcrumb category={medium} title={artwork.title[locale] || artwork.title.he} bc={bc} />
 
-      {/* Desktop: image (end/left) + sticky panel (start/right). Mobile: image first. */}
+      {/* Desktop: image (end/left) + purchase panel (start/right). Mobile: image first. */}
       <div className="mt-6 flex flex-col gap-8 lg:flex-row-reverse lg:items-start lg:gap-12">
         {/* min-w-0 lets the flex item shrink below its content width; flex-1
             absorbs the gap so the two columns never exceed the row (no overflow). */}
@@ -105,12 +103,12 @@ function ArtworkDetail({ artwork, otherArtworks }: { artwork: Artwork; otherArtw
             }}
           />
         </div>
-        <div className="lg:w-[38%] lg:shrink-0 lg:sticky lg:top-24 lg:self-start">
+        <div className="lg:w-[38%] lg:shrink-0">
           <PurchasePanel artwork={artwork} />
         </div>
       </div>
 
-      {/* Below the fold — story, scale, artist. Editorial prose width. */}
+      {/* Below the fold — story, artist, other works. Editorial prose width. */}
       <div className="mt-16 flex flex-col gap-16 md:mt-24">
         {/* Prominent Artist's Story Highlight Section */}
         <section className="max-w-[var(--container-prose)] rounded-panel border border-border bg-sand/50 p-6 md:p-8">
@@ -128,19 +126,6 @@ function ArtworkDetail({ artwork, otherArtworks }: { artwork: Artwork; otherArtw
           <p className="mt-4 text-[length:var(--text-h3)] leading-relaxed text-text font-serif">
             {storyText}
           </p>
-        </section>
-
-        <section>
-          <h2 className="text-h2 font-medium">{t("sections.scale")}</h2>
-          <div
-            className="mt-4 flex items-center justify-center rounded-panel bg-sand"
-            style={{ aspectRatio: "16 / 9" }}
-          >
-            <span className="text-small text-text-muted/70">
-              {scaleImage?.caption[locale] ?? t("sections.scaleNote")}
-            </span>
-          </div>
-          <p className="mt-2 text-caption text-text-muted">{t("sections.scaleNote")}</p>
         </section>
 
         <section className="max-w-[var(--container-prose)]">
