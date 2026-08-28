@@ -118,9 +118,7 @@
     },
     "sections": {
       "story": "Behind the work",
-      "artist": "About the artist",
-      "scale": "The work in a room",
-      "scaleNote": "Scale reference — the piece in a real space."
+      "artist": "About the artist"
     },
     "gallery": {
       "label": "Image gallery",

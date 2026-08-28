@@ -15,7 +15,7 @@ export function SiteHeader() {
   const t = useTranslations("Nav");
 
   return (
-    <header className="sticky top-0 z-40 bg-surface/95 backdrop-blur-md">
+    <header className="relative z-40 bg-surface/95 backdrop-blur-md">
       <div className="flex min-h-[30px] items-center justify-center bg-deep px-6 py-1.5 text-center text-caption text-surface/90">
         {t("shipping")}
       </div>
