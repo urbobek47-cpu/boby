@@ -2,12 +2,13 @@
 
 import React, { useState, useEffect } from "react";
 
-const STORAGE_KEY = "boby_liked_artworks";
+const PRIMARY_KEY = "boby-liked-artworks";
+const LEGACY_KEY = "boby_liked_artworks";
 
 export function getLikedSlugs(): string[] {
   if (typeof window === "undefined") return [];
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(PRIMARY_KEY) || localStorage.getItem(LEGACY_KEY);
     return raw ? JSON.parse(raw) : [];
   } catch {
     return [];
@@ -24,7 +25,8 @@ export function toggleSlugLiked(slug: string): boolean {
     const current = getLikedSlugs();
     const exists = current.includes(slug);
     const updated = exists ? current.filter((s) => s !== slug) : [...current, slug];
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    localStorage.setItem(PRIMARY_KEY, JSON.stringify(updated));
+    localStorage.setItem(LEGACY_KEY, JSON.stringify(updated));
     window.dispatchEvent(new CustomEvent("boby-like-change", { detail: { slug, liked: !exists } }));
     return !exists;
   } catch {
@@ -112,3 +114,5 @@ export function LikeButton({ slug, title, className = "", variant = "floating" }
     </button>
   );
 }
+
+export const ArtworkLikeButton = LikeButton;

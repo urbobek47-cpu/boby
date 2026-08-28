@@ -23,7 +23,7 @@ export function ArtworkCard({ artwork }: { artwork: Artwork }) {
 
   return (
     <div className="group relative flex flex-col gap-2 md:gap-3 rounded-card">
-      <div className="absolute top-2.5 end-2.5 z-30 pointer-events-auto"> {/* logical-ok */}
+      <div className="absolute top-3 left-3 z-30 pointer-events-auto"> {/* logical-ok */}
         <LikeButton slug={artwork.slug} title={artworkTitle} />
       </div>
 

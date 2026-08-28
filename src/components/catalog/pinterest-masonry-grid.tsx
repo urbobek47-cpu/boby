@@ -42,8 +42,8 @@ export function PinterestMasonryGrid({ artworks }: PinterestMasonryGridProps) {
             key={artwork.slug}
             className="break-inside-avoid group relative overflow-hidden rounded-artwork bg-surface shadow-[var(--shadow-soft)] transition-all duration-300 hover:shadow-md border border-stone/40"
           >
-            {/* Floating Like Button - Top Left Corner (end-2.5 in RTL) */}
-            <div className="absolute top-2.5 end-2.5 z-30 pointer-events-auto"> {/* logical-ok */}
+            {/* Physical Top-Left Corner Heart Button */}
+            <div className="absolute top-3 left-3 z-30 pointer-events-auto"> {/* logical-ok */}
               <LikeButton slug={artwork.slug} title={artworkTitle} />
             </div>
 
