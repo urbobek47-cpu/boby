@@ -37,7 +37,7 @@ export function PinterestMasonryGrid({ artworks }: PinterestMasonryGridProps) {
                   <img
                     src={primaryImage.publicId}
                     alt={`${artworkTitle} — ${artistName}`}
-                    className="w-full h-auto object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                    className="w-full h-auto object-cover transition-transform duration-300 ease-out transform-gpu group-hover:scale-105"
                     loading="lazy"
                   />
                 ) : (
@@ -68,7 +68,7 @@ export function PinterestMasonryGrid({ artworks }: PinterestMasonryGridProps) {
                 </div>
 
                 {/* Desktop Hover Info Overlay - Bottom-only gradient, artwork remains 100% visible */}
-                <div className="absolute inset-x-0 bottom-0 hidden md:flex flex-col justify-end bg-gradient-to-t from-black/80 via-black/30 to-transparent pt-12 pb-3.5 px-3.5 opacity-0 transition-opacity duration-300 group-hover:opacity-100 text-surface pointer-events-none">
+                <div className="absolute inset-x-0 bottom-0 hidden md:flex flex-col justify-end bg-gradient-to-t from-black/80 via-black/20 to-transparent pt-12 pb-3.5 px-3.5 opacity-0 transition-opacity duration-300 group-hover:opacity-100 text-surface pointer-events-none z-10">
                   <div className="flex items-center justify-between gap-2 pointer-events-auto">
                     <div className="flex items-center gap-2.5 min-w-0">
                       {artist.portraitPublicId ? (
@@ -92,7 +92,7 @@ export function PinterestMasonryGrid({ artworks }: PinterestMasonryGridProps) {
                       </div>
                     </div>
 
-                    <span className="text-caption font-medium text-text bg-surface/95 backdrop-blur-sm px-2.5 py-1 rounded-control shadow-sm shrink-0 hover:bg-surface transition-colors">
+                    <span className="text-caption font-medium text-text bg-surface border border-stone/40 px-2.5 py-1 rounded-control shadow-sm shrink-0 hover:bg-sand transition-colors">
                       צפה בסטודיו ←
                     </span>
                   </div>
