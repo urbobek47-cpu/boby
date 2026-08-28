@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 
-export function HeaderSearchBar({ placeholder }: { placeholder: string }) {
+function HeaderSearchBarInput({ placeholder }: { placeholder: string }) {
   const searchParams = useSearchParams();
   const paramValue = searchParams?.get("search") || "";
   const [value, setValue] = useState(paramValue);
@@ -54,5 +54,20 @@ export function HeaderSearchBar({ placeholder }: { placeholder: string }) {
         </button>
       ) : null}
     </form>
+  );
+}
+
+export function HeaderSearchBar(props: { placeholder: string }) {
+  return (
+    <Suspense
+      fallback={
+        <form action="/works" method="GET" className="relative w-full">
+          <span className="absolute start-3 top-1/2 -translate-y-1/2 text-text-muted text-small pointer-events-none z-10">🔍</span>
+          <input type="text" name="search" placeholder={props.placeholder} className="w-full rounded-full border border-stone/60 bg-sand/60 ps-8 pe-8 py-1.5 text-[16px] text-text sm:ps-10 sm:pe-4 sm:py-2 sm:text-small" />
+        </form>
+      }
+    >
+      <HeaderSearchBarInput {...props} />
+    </Suspense>
   );
 }
