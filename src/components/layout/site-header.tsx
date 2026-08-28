@@ -2,6 +2,7 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { LocaleToggle } from "@/components/layout/locale-toggle";
 import { UserMenu } from "@/components/auth/user-menu";
+import { HeaderSearchBar } from "@/components/layout/header-search-bar";
 
 /**
  * Shared site header. A slim shipping-note bar (~30px), then a three-part row:
@@ -35,18 +36,8 @@ export function SiteHeader() {
           </Link>
 
           {/* Pinterest-Style Rounded Search Bar */}
-          <div className="flex flex-1 items-center max-w-xl mx-1 sm:mx-2 md:mx-6">
-            <form action="/works" method="GET" className="relative w-full">
-              <span className="absolute start-3 top-1/2 -translate-y-1/2 text-text-muted text-small" aria-hidden="true">
-                🔍
-              </span>
-              <input
-                type="text"
-                name="search"
-                placeholder="חפש אמנים או יצירות..."
-                className="w-full rounded-full bg-sand/60 ps-8 pe-3 py-1.5 sm:ps-10 sm:pe-4 sm:py-2 text-caption sm:text-small text-text placeholder:text-text-muted/70 border border-stone/60 transition-all focus:border-accent-strong focus:bg-surface focus:outline-none focus:ring-2 focus:ring-accent-strong/20"
-              />
-            </form>
+          <div className="flex flex-1 items-center max-w-xl mx-1 sm:mx-2 md:mx-6 min-w-0">
+            <HeaderSearchBar placeholder="חפש אמנים או יצירות..." />
           </div>
 
           {/* User Profile & Actions */}
