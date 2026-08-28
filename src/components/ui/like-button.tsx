@@ -84,20 +84,20 @@ export function LikeButton({ slug, title, className = "", variant = "floating" }
       onClick={handleToggle}
       aria-label={label}
       aria-pressed={liked}
-      className={`group/like flex h-9 w-9 items-center justify-center rounded-full transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-strong z-20 ${
-        isFloating
-          ? "bg-surface/90 hover:bg-surface text-text shadow-sm backdrop-blur-sm border border-stone/50 hover:scale-105 active:scale-95"
-          : "border border-stone/60 bg-sand/60 hover:bg-surface text-text hover:scale-105 active:scale-95 px-3 py-1.5 h-auto w-auto gap-1.5"
+      className={`group/like flex ${
+        isFloating ? "h-8 w-8 sm:h-9 sm:w-9" : "px-3 py-1.5 h-auto w-auto gap-1.5"
+      } items-center justify-center rounded-full bg-surface/95 text-text shadow-md border border-stone/60 backdrop-blur-md transition-all duration-200 hover:scale-110 active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-strong z-30 ${
+        liked ? "border-accent-strong bg-surface" : "hover:border-accent-strong"
       } ${animating ? "scale-125" : ""} ${className}`}
     >
       <svg
         className={`h-4 w-4 transition-all duration-200 ${
           liked
             ? "fill-[#C17F59] stroke-[#8A5335] scale-110"
-            : "fill-none stroke-current opacity-70 group-hover/like:opacity-100 group-hover/like:stroke-accent-strong"
+            : "fill-none stroke-[#111827] group-hover/like:stroke-[#8A5335]"
         }`}
         viewBox="0 0 24 24"
-        strokeWidth="2"
+        strokeWidth="2.2"
         strokeLinecap="round"
         strokeLinejoin="round"
         aria-hidden="true"
