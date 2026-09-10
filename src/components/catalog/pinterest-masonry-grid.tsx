@@ -34,10 +34,7 @@ export function PinterestMasonryGrid({
   // Filter artworks per viewport visibility rules:
   // Mobile hides "אור מכתש פנורמי" (art-painting-desert-horizon)
   const mobileArtworks = artworks.filter((a) => a.slug !== "art-painting-desert-horizon");
-  // Desktop hides "קערת סלט טרקוטה" & "פסל עץ אלון ממוחזר"
-  const desktopArtworks = artworks.filter(
-    (a) => a.slug !== "art-ceramics-terracotta-salad-bowl" && a.slug !== "art-wood-oak-sculpture"
-  );
+  const desktopArtworks = artworks;
 
   // Build Mobile 2-Column arrays (<768px)
   const mobileCols: React.ReactNode[][] = [[], []];
