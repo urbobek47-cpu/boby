@@ -102,13 +102,13 @@ export function PinterestMasonryGrid({
   return (
     <>
       {/* Mobile 2-Column Explicit Flex Layout */}
-      <div className="flex md:hidden flex-row gap-8 sm:gap-10 w-full items-start">
-        <div className="flex flex-col gap-8 sm:gap-10 flex-1 min-w-0">
+      <div className="flex md:hidden flex-row gap-10 sm:gap-12 w-full items-start">
+        <div className="flex flex-col gap-10 sm:gap-12 flex-1 min-w-0">
           {mobileCols[0].map((item, idx) => (
             <React.Fragment key={idx}>{item}</React.Fragment>
           ))}
         </div>
-        <div className="flex flex-col gap-8 sm:gap-10 flex-1 min-w-0">
+        <div className="flex flex-col gap-10 sm:gap-12 flex-1 min-w-0">
           {mobileCols[1].map((item, idx) => (
             <React.Fragment key={idx}>{item}</React.Fragment>
           ))}
@@ -116,18 +116,18 @@ export function PinterestMasonryGrid({
       </div>
 
       {/* Tablet 3-Column Explicit Flex Layout (768px - 1280px) */}
-      <div className="hidden md:flex xl:hidden flex-row gap-12 lg:gap-14 w-full items-start">
-        <div className="flex flex-col gap-12 lg:gap-14 flex-1 min-w-0">
+      <div className="hidden md:flex xl:hidden flex-row gap-16 lg:gap-20 w-full items-start">
+        <div className="flex flex-col gap-16 lg:gap-20 flex-1 min-w-0">
           {tabletCols[0].map((item, idx) => (
             <React.Fragment key={idx}>{item}</React.Fragment>
           ))}
         </div>
-        <div className="flex flex-col gap-12 lg:gap-14 flex-1 min-w-0">
+        <div className="flex flex-col gap-16 lg:gap-20 flex-1 min-w-0">
           {tabletCols[1].map((item, idx) => (
             <React.Fragment key={idx}>{item}</React.Fragment>
           ))}
         </div>
-        <div className="flex flex-col gap-12 lg:gap-14 flex-1 min-w-0">
+        <div className="flex flex-col gap-16 lg:gap-20 flex-1 min-w-0">
           {tabletCols[2].map((item, idx) => (
             <React.Fragment key={idx}>{item}</React.Fragment>
           ))}
@@ -135,23 +135,23 @@ export function PinterestMasonryGrid({
       </div>
 
       {/* Widescreen 15"+ Desktop 4-Column Explicit Flex Layout (>=1280px) */}
-      <div className="hidden xl:flex flex-row gap-16 2xl:gap-20 w-full items-start">
-        <div className="flex flex-col gap-16 2xl:gap-20 flex-1 min-w-0">
+      <div className="hidden xl:flex flex-row gap-24 2xl:gap-32 w-full items-start">
+        <div className="flex flex-col gap-24 2xl:gap-32 flex-1 min-w-0">
           {desktopCols[0].map((item, idx) => (
             <React.Fragment key={idx}>{item}</React.Fragment>
           ))}
         </div>
-        <div className="flex flex-col gap-16 2xl:gap-20 flex-1 min-w-0">
+        <div className="flex flex-col gap-24 2xl:gap-32 flex-1 min-w-0">
           {desktopCols[1].map((item, idx) => (
             <React.Fragment key={idx}>{item}</React.Fragment>
           ))}
         </div>
-        <div className="flex flex-col gap-16 2xl:gap-20 flex-1 min-w-0">
+        <div className="flex flex-col gap-24 2xl:gap-32 flex-1 min-w-0">
           {desktopCols[2].map((item, idx) => (
             <React.Fragment key={idx}>{item}</React.Fragment>
           ))}
         </div>
-        <div className="flex flex-col gap-16 2xl:gap-20 flex-1 min-w-0">
+        <div className="flex flex-col gap-24 2xl:gap-32 flex-1 min-w-0">
           {desktopCols[3].map((item, idx) => (
             <React.Fragment key={idx}>{item}</React.Fragment>
           ))}
