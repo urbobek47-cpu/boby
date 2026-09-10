@@ -162,7 +162,7 @@ function CatalogueView({
       {filtered.length > 0 ? (
         <ul
           role="list"
-          className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 md:gap-x-6 md:gap-y-10"
+          className="mt-6 grid grid-cols-2 gap-6 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 md:gap-x-10 md:gap-y-14 xl:gap-x-12 xl:gap-y-16"
         >
           {filtered.map((artwork, index) => (
             <React.Fragment key={artwork.slug}>
