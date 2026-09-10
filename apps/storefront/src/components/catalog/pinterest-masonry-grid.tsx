@@ -59,41 +59,41 @@ export function PinterestMasonryGrid({
     }
   });
 
-  // Build Tablet 3-Column arrays (768px - 1280px)
-  const tabletCols: React.ReactNode[][] = [[], [], []];
+  // Build Tablet 2-Column Large Layout (768px - 1024px)
+  const tabletCols: React.ReactNode[][] = [[], []];
   desktopArtworks.forEach((artwork, index) => {
-    const targetCol = index % 3;
+    const targetCol = index % 2;
     tabletCols[targetCol].push(
       <ArtworkMasonryCard key={artwork.slug} artwork={artwork} locale={locale} isEager={index < 4} />
     );
 
     if (featuredArtist && index === 3) {
-      tabletCols[(targetCol + 1) % 3].push(
+      tabletCols[(targetCol + 1) % 2].push(
         <ArtistSpotlightTile key="artist-spotlight-tablet" featuredArtist={featuredArtist} locale={locale} />
       );
     }
     if (showCorporateTile && index === 8) {
-      tabletCols[(targetCol + 1) % 3].push(
+      tabletCols[(targetCol + 1) % 2].push(
         <CorporateGiftsTile key="corporate-gifts-tablet" />
       );
     }
   });
 
-  // Build Widescreen Desktop 4-Column arrays (>=1280px / 15"+ Laptops & Monitors)
-  const desktopCols: React.ReactNode[][] = [[], [], [], []];
+  // Build Desktop 3-Column Large Layout (>=1024px / Large Screens & Monitors)
+  const desktopCols: React.ReactNode[][] = [[], [], []];
   desktopArtworks.forEach((artwork, index) => {
-    const targetCol = index % 4;
+    const targetCol = index % 3;
     desktopCols[targetCol].push(
       <ArtworkMasonryCard key={artwork.slug} artwork={artwork} locale={locale} isEager={index < 4} />
     );
 
     if (featuredArtist && index === 3) {
-      desktopCols[(targetCol + 1) % 4].push(
+      desktopCols[(targetCol + 1) % 3].push(
         <ArtistSpotlightTile key="artist-spotlight-desktop" featuredArtist={featuredArtist} locale={locale} />
       );
     }
     if (showCorporateTile && index === 8) {
-      desktopCols[(targetCol + 1) % 4].push(
+      desktopCols[(targetCol + 1) % 3].push(
         <CorporateGiftsTile key="corporate-gifts-desktop" />
       );
     }
@@ -102,57 +102,47 @@ export function PinterestMasonryGrid({
   return (
     <>
       {/* Mobile 2-Column Explicit Flex Layout */}
-      <div className="flex md:hidden flex-row gap-10 sm:gap-12 w-full items-start">
-        <div className="flex flex-col gap-10 sm:gap-12 flex-1 min-w-0">
+      <div className="flex md:hidden flex-row gap-8 sm:gap-10 w-full items-start">
+        <div className="flex flex-col gap-8 sm:gap-10 flex-1 min-w-0">
           {mobileCols[0].map((item, idx) => (
             <React.Fragment key={idx}>{item}</React.Fragment>
           ))}
         </div>
-        <div className="flex flex-col gap-10 sm:gap-12 flex-1 min-w-0">
+        <div className="flex flex-col gap-8 sm:gap-10 flex-1 min-w-0">
           {mobileCols[1].map((item, idx) => (
             <React.Fragment key={idx}>{item}</React.Fragment>
           ))}
         </div>
       </div>
 
-      {/* Tablet 3-Column Explicit Flex Layout (768px - 1280px) */}
-      <div className="hidden md:flex xl:hidden flex-row gap-16 lg:gap-20 w-full items-start">
-        <div className="flex flex-col gap-16 lg:gap-20 flex-1 min-w-0">
+      {/* Tablet 2-Column Large Layout (768px - 1024px) */}
+      <div className="hidden md:flex lg:hidden flex-row gap-12 md:gap-14 w-full items-start">
+        <div className="flex flex-col gap-12 md:gap-14 flex-1 min-w-0">
           {tabletCols[0].map((item, idx) => (
             <React.Fragment key={idx}>{item}</React.Fragment>
           ))}
         </div>
-        <div className="flex flex-col gap-16 lg:gap-20 flex-1 min-w-0">
+        <div className="flex flex-col gap-12 md:gap-14 flex-1 min-w-0">
           {tabletCols[1].map((item, idx) => (
-            <React.Fragment key={idx}>{item}</React.Fragment>
-          ))}
-        </div>
-        <div className="flex flex-col gap-16 lg:gap-20 flex-1 min-w-0">
-          {tabletCols[2].map((item, idx) => (
             <React.Fragment key={idx}>{item}</React.Fragment>
           ))}
         </div>
       </div>
 
-      {/* Widescreen 15"+ Desktop 4-Column Explicit Flex Layout (>=1280px) */}
-      <div className="hidden xl:flex flex-row gap-24 2xl:gap-32 w-full items-start">
-        <div className="flex flex-col gap-24 2xl:gap-32 flex-1 min-w-0">
+      {/* Widescreen Desktop 3-Column Large Layout (>=1024px) */}
+      <div className="hidden lg:flex flex-row gap-14 lg:gap-16 xl:gap-20 2xl:gap-24 w-full items-start">
+        <div className="flex flex-col gap-14 lg:gap-16 xl:gap-20 2xl:gap-24 flex-1 min-w-0">
           {desktopCols[0].map((item, idx) => (
             <React.Fragment key={idx}>{item}</React.Fragment>
           ))}
         </div>
-        <div className="flex flex-col gap-24 2xl:gap-32 flex-1 min-w-0">
+        <div className="flex flex-col gap-14 lg:gap-16 xl:gap-20 2xl:gap-24 flex-1 min-w-0">
           {desktopCols[1].map((item, idx) => (
             <React.Fragment key={idx}>{item}</React.Fragment>
           ))}
         </div>
-        <div className="flex flex-col gap-24 2xl:gap-32 flex-1 min-w-0">
+        <div className="flex flex-col gap-14 lg:gap-16 xl:gap-20 2xl:gap-24 flex-1 min-w-0">
           {desktopCols[2].map((item, idx) => (
-            <React.Fragment key={idx}>{item}</React.Fragment>
-          ))}
-        </div>
-        <div className="flex flex-col gap-24 2xl:gap-32 flex-1 min-w-0">
-          {desktopCols[3].map((item, idx) => (
             <React.Fragment key={idx}>{item}</React.Fragment>
           ))}
         </div>
@@ -178,13 +168,13 @@ function ArtworkMasonryCard({
   const artworkTitle = artwork.title[locale] || artwork.title.he;
 
   const aspectRatio = primaryImage?.aspectRatio || 4 / 5;
-  const cardImgSrc = getOptimizedImageUrl(primaryImage?.publicId, 400, 75);
-  const avatarImgSrc = getOptimizedImageUrl(artist.portraitPublicId, 100, 75);
+  const cardImgSrc = getOptimizedImageUrl(primaryImage?.publicId, 800, 80);
+  const avatarImgSrc = getOptimizedImageUrl(artist.portraitPublicId, 120, 80);
 
   return (
-    <div className="group relative overflow-hidden rounded-[12px] bg-surface shadow-[var(--shadow-soft)] transition-all duration-300 hover:shadow-md border border-stone/40 flex flex-col w-full">
+    <div className="group relative overflow-hidden rounded-[14px] bg-surface shadow-[var(--shadow-soft)] transition-all duration-300 hover:shadow-lg border border-stone/40 flex flex-col w-full">
       {/* Top-Start Corner Heart Button: Hidden by default, visible on hover */}
-      <div className="absolute top-2.5 start-2.5 z-30 pointer-events-auto opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+      <div className="absolute top-3 start-3 z-30 pointer-events-auto opacity-0 group-hover:opacity-100 transition-opacity duration-200">
         <LikeButton slug={artwork.slug} title={artworkTitle} />
       </div>
 
@@ -206,42 +196,42 @@ function ArtworkMasonryCard({
               decoding="async"
             />
           ) : (
-            <div className="flex h-48 w-full items-center justify-center bg-stone/30 text-text-muted text-small">
+            <div className="flex h-56 w-full items-center justify-center bg-stone/30 text-text-muted text-body">
               🎨 {artwork.category[locale] || artwork.category.he}
             </div>
           )}
         </div>
 
         {/* Permanent Text Info Container directly beneath image in earthy brown tone (#E5D8C8) */}
-        <div className="p-2.5 sm:p-3 flex flex-col gap-1 bg-[#E5D8C8] border-t border-[#D5C4B1] shrink-0 w-full mt-auto">
+        <div className="p-3.5 sm:p-4 flex flex-col gap-1.5 bg-[#E5D8C8] border-t border-[#D5C4B1] shrink-0 w-full mt-auto">
           <div className="flex items-baseline justify-between gap-2">
-            <h3 className="text-xs sm:text-small font-medium text-[#2A211E] group-hover:text-accent-strong truncate">
+            <h3 className="text-small sm:text-body md:text-[1.1rem] font-medium text-[#2A211E] group-hover:text-accent-strong truncate">
               {artworkTitle}
             </h3>
-            <Price agorot={artwork.priceAgorot} className="text-xs sm:text-small font-semibold text-[#2A211E] shrink-0" />
+            <Price agorot={artwork.priceAgorot} className="text-small sm:text-body md:text-[1.1rem] font-semibold text-[#2A211E] shrink-0" />
           </div>
 
-          <div className="flex items-center justify-between gap-2 text-caption text-[#5C483A]">
-            <div className="flex items-center gap-1.5 min-w-0">
+          <div className="flex items-center justify-between gap-2 text-caption sm:text-small text-[#5C483A]">
+            <div className="flex items-center gap-2 min-w-0">
               {avatarImgSrc ? (
                 <img
                   src={avatarImgSrc}
                   alt={artistName}
-                  className="h-4.5 w-4.5 sm:h-5 sm:w-5 rounded-full object-cover border border-[#C8B8A6] shrink-0"
+                  className="h-5 w-5 sm:h-6 sm:w-6 rounded-full object-cover border border-[#C8B8A6] shrink-0"
                   loading={isEager ? "eager" : "lazy"}
                   decoding="async"
                 />
               ) : (
-                <div className="flex h-4.5 w-4.5 sm:h-5 sm:w-5 items-center justify-center rounded-full bg-accent-strong text-surface text-[9px] font-bold shrink-0">
+                <div className="flex h-5 w-5 sm:h-6 sm:w-6 items-center justify-center rounded-full bg-accent-strong text-surface text-[10px] sm:text-caption font-bold shrink-0">
                   {artistName.slice(0, 1)}
                 </div>
               )}
-              <span className="truncate font-medium text-[#5C483A] text-[11px] sm:text-caption">
+              <span className="truncate font-medium text-[#5C483A] text-caption sm:text-small">
                 <bdi>{artistName}</bdi>
               </span>
             </div>
 
-            <span className="text-[10px] font-medium text-accent-strong group-hover:translate-x-[-2px] transition-transform shrink-0">
+            <span className="text-caption font-medium text-accent-strong group-hover:translate-x-[-2px] transition-transform shrink-0">
               ←
             </span>
           </div>
