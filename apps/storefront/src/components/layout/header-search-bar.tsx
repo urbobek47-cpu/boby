@@ -20,7 +20,7 @@ function HeaderSearchBarInput({ placeholder }: { placeholder: string }) {
       className="relative w-full"
     >
       <span
-        className="absolute start-3 top-1/2 -translate-y-1/2 text-text-muted text-small pointer-events-none z-10"
+        className="absolute start-2.5 top-1/2 -translate-y-1/2 text-text-muted text-small pointer-events-none z-10"
         aria-hidden="true"
       >
         🔍
@@ -37,10 +37,10 @@ function HeaderSearchBarInput({ placeholder }: { placeholder: string }) {
         autoCorrect="off"
         autoCapitalize="none"
         spellCheck="false"
-        className={`w-full rounded-full border bg-sand/60 ps-8 pe-8 py-1.5 text-[16px] leading-normal text-text placeholder:text-text-muted/70 transition-all sm:ps-10 sm:pe-4 sm:py-2 sm:text-small ${
+        className={`w-full rounded-full border ps-8 pe-7 py-1.5 text-[16px] leading-normal text-text placeholder:text-text-muted/70 transition-all sm:ps-10 sm:pe-4 sm:py-2 sm:text-small ${
           isFocused
             ? "border-accent-strong bg-surface outline-none ring-2 ring-accent-strong/20 shadow-sm"
-            : "border-stone/60 hover:border-stone"
+            : "border-stone/60 bg-sand/80 hover:border-stone"
         } caret-accent-strong`}
       />
       {value ? (
@@ -48,7 +48,7 @@ function HeaderSearchBarInput({ placeholder }: { placeholder: string }) {
           type="button"
           onClick={() => setValue("")}
           aria-label="נקה חיפוש"
-          className="absolute end-2.5 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full bg-stone/50 text-[11px] text-text-muted hover:bg-stone hover:text-text focus-visible:outline-none z-10"
+          className="absolute end-2 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full bg-stone/50 text-[11px] text-text-muted hover:bg-stone hover:text-text focus-visible:outline-none z-10"
         >
           ✕
         </button>

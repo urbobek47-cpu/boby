@@ -21,17 +21,25 @@ export function ArtworkCard({ artwork }: { artwork: Artwork }) {
   const statusMuted = artwork.availability === "sold" || artwork.availability === "reserved";
   const artworkTitle = artwork.title[locale] || artwork.title.he;
 
+  const isMobileHidden = artwork.slug === "art-painting-desert-horizon";
+  const isDesktopHidden = artwork.slug === "art-ceramics-terracotta-salad-bowl" || artwork.slug === "art-wood-oak-sculpture";
+  const visibilityClass = isMobileHidden
+    ? "hidden md:flex md:flex-col"
+    : isDesktopHidden
+      ? "flex flex-col md:hidden"
+      : "flex flex-col";
+
   return (
-    <div className="group relative flex flex-col gap-2 md:gap-3 rounded-card">
-      <div className="absolute top-3 left-3 z-30 pointer-events-auto"> {/* logical-ok */}
+    <div className={`group relative rounded-[14px] overflow-hidden border border-stone/40 bg-surface shadow-[var(--shadow-soft)] transition-all duration-300 hover:shadow-md ${visibilityClass}`}>
+      <div className="absolute top-3 left-3 z-30 pointer-events-auto opacity-0 group-hover:opacity-100 transition-opacity duration-200"> {/* logical-ok */}
         <LikeButton slug={artwork.slug} title={artworkTitle} />
       </div>
 
       <Link
         href={`/works/${artwork.slug}`}
-        className="block focus-visible:outline-none"
+        className="block focus-visible:outline-none flex-1 flex flex-col"
       >
-        <div className="overflow-hidden rounded-artwork bg-sand/30 shadow-sm transition-shadow group-hover:shadow-md">
+        <div className="overflow-hidden bg-sand/40 shrink-0">
           <ArtImage
             publicId={primary?.publicId ?? null}
             alt={`${artworkTitle} — ${artwork.artist.displayName[locale] || artwork.artist.displayName.he}`}
@@ -42,16 +50,19 @@ export function ArtworkCard({ artwork }: { artwork: Artwork }) {
           />
         </div>
 
-        <div className="flex flex-col gap-0.5 md:gap-1 px-0.5 mt-2 md:mt-3">
-          <h3 className="text-small md:text-h3 font-medium text-text underline-offset-4 group-hover:text-accent-strong truncate">
-            {artworkTitle}
-          </h3>
-          <p className="text-caption md:text-small text-text-muted truncate">
-            <bdi>{artwork.artist.displayName[locale] || artwork.artist.displayName.he}</bdi>
-          </p>
-          <div className="mt-0.5 flex items-baseline justify-between gap-2">
-            <Price agorot={artwork.priceAgorot} className="text-small md:text-body font-semibold text-text" />
-            <span className={statusMuted ? "text-caption text-text-muted/70" : "text-caption text-accent-strong font-medium"}>
+        <div className="p-3 sm:p-3.5 flex flex-col gap-1.5 bg-[#E5D8C8] border-t border-[#D5C4B1] shrink-0 w-full mt-auto">
+          <div className="flex items-baseline justify-between gap-2">
+            <h3 className="text-small md:text-body font-medium text-[#2A211E] group-hover:text-accent-strong truncate">
+              {artworkTitle}
+            </h3>
+            <Price agorot={artwork.priceAgorot} className="text-small md:text-body font-semibold text-[#2A211E] shrink-0" />
+          </div>
+
+          <div className="flex items-center justify-between gap-2 text-caption text-[#5C483A]">
+            <p className="truncate font-medium text-[#5C483A]">
+              <bdi>{artwork.artist.displayName[locale] || artwork.artist.displayName.he}</bdi>
+            </p>
+            <span className={statusMuted ? "text-caption text-[#5C483A]/70 shrink-0" : "text-caption text-accent-strong font-medium shrink-0"}>
               {t(status.key, status.values)}
             </span>
           </div>

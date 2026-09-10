@@ -34,6 +34,24 @@ export function toggleSlugLiked(slug: string): boolean {
   }
 }
 
+// Module-level singleton listener registry to reduce window event listeners from 100+ down to 2
+const subscribers = new Set<(changedSlug?: string) => void>();
+let globalListenersAttached = false;
+
+function ensureGlobalListeners() {
+  if (typeof window === "undefined" || globalListenersAttached) return;
+
+  const notify = (e: Event) => {
+    const customEvt = e as CustomEvent<{ slug: string; liked: boolean }>;
+    const changedSlug = customEvt.detail?.slug;
+    subscribers.forEach((cb) => cb(changedSlug));
+  };
+
+  window.addEventListener("boby-like-change", notify);
+  window.addEventListener("storage", notify);
+  globalListenersAttached = true;
+}
+
 interface LikeButtonProps {
   slug: string;
   title?: string;
@@ -47,21 +65,17 @@ export function LikeButton({ slug, title, className = "", variant = "floating" }
 
   useEffect(() => {
     setLiked(isSlugLiked(slug));
+    ensureGlobalListeners();
 
-    const handleSync = (e: Event) => {
-      const customEvt = e as CustomEvent<{ slug: string; liked: boolean }>;
-      if (customEvt.detail?.slug === slug) {
-        setLiked(customEvt.detail.liked);
-      } else {
+    const callback = (changedSlug?: string) => {
+      if (!changedSlug || changedSlug === slug) {
         setLiked(isSlugLiked(slug));
       }
     };
 
-    window.addEventListener("boby-like-change", handleSync);
-    window.addEventListener("storage", handleSync);
+    subscribers.add(callback);
     return () => {
-      window.removeEventListener("boby-like-change", handleSync);
-      window.removeEventListener("storage", handleSync);
+      subscribers.delete(callback);
     };
   }, [slug]);
 
@@ -78,17 +92,13 @@ export function LikeButton({ slug, title, className = "", variant = "floating" }
     ? `הסרת ${title || "היצירה"} ממועדפים`
     : `הוספת ${title || "היצירה"} למועדפים`;
 
-  const isFloating = variant === "floating";
-
   return (
     <button
       type="button"
       onClick={handleToggle}
       aria-label={label}
       aria-pressed={liked}
-      className={`group/like flex ${
-        isFloating ? "h-8 w-8 sm:h-9 sm:w-9" : "px-3 py-1.5 h-auto w-auto gap-1.5"
-      } items-center justify-center rounded-full bg-surface/95 text-text shadow-md border border-stone/60 backdrop-blur-md transition-all duration-200 hover:scale-110 active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-strong z-30 ${
+      className={`group/like flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-surface/95 text-text shadow-md border border-stone/60 backdrop-blur-md transition-all duration-200 hover:scale-110 active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-strong z-30 ${
         liked ? "border-accent-strong bg-surface" : "hover:border-accent-strong"
       } ${animating ? "scale-125" : ""} ${className}`}
     >
@@ -106,11 +116,6 @@ export function LikeButton({ slug, title, className = "", variant = "floating" }
       >
         <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
       </svg>
-      {!isFloating && (
-        <span className="text-caption font-medium text-text">
-          {liked ? "אהבתי" : "ללייק"}
-        </span>
-      )}
     </button>
   );
 }

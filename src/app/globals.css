@@ -18,6 +18,7 @@
   --color-bg: #eceae6; /* warm-grey gallery background */
   --color-surface: #ffffff; /* cards, panels — the "white cube" surface */
   --color-sand: #efe6dc; /* warm panel / image bed */
+  --color-earthy: #e5d8c8; /* warm earthy clay brown - frame under artwork cards */
   --color-stone: #d7d2cb; /* warm mid neutral — soft borders, pills */
   --color-deep: #2a211e; /* warm near-black — corporate hero, footer */
   --color-text: #111827; /* body */
@@ -50,7 +51,7 @@
   --spacing: 4px;
 
   /* ---- radii (§3.3) — DIFFERENTIATED, never uniform ---- */
-  --radius-artwork: 2px; /* the work is the object, not a card (0–4px) */
+  --radius-artwork: 14px; /* subtle, elegant 14px radius for artwork tiles */
   --radius-card: 8px; /* editorial cards */
   --radius-control: 10px; /* forms & controls (10–12px) */
   --radius-panel: 16px; /* large promotional panels */

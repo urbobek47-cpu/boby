@@ -56,6 +56,17 @@ export function SupportChatWidget() {
     };
   }, []);
 
+  // Listen for custom event from CategoryDrawer / header menu
+  useEffect(() => {
+    function handleOpenSupportChat() {
+      setIsOpen(true);
+    }
+    window.addEventListener("boby-open-support-chat", handleOpenSupportChat);
+    return () => {
+      window.removeEventListener("boby-open-support-chat", handleOpenSupportChat);
+    };
+  }, []);
+
   const addMessage = (sender: "bot" | "user", text: string) => {
     const newMsg: ChatMessage = {
       id: `msg-${Date.now()}`,
@@ -114,15 +125,15 @@ export function SupportChatWidget() {
   };
 
   return (
-    <div className="fixed bottom-20 end-4 z-30 md:bottom-6 md:end-6" ref={chatRef}>
-      {/* Floating Chat Trigger Button - Minimalist Transparent Icon without background circle */}
+    <div className="fixed bottom-4 end-4 z-30 md:bottom-6 md:end-6" ref={chatRef}>
+      {/* Floating Chat Trigger Button - Hidden on mobile, visible on desktop */}
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
         aria-haspopup="true"
         aria-label="צ'אט תמיכה ושירות לקוחות"
-        className="flex h-10 w-10 items-center justify-center bg-transparent text-text hover:scale-110 transition-transform focus-visible:outline-none p-0 border-0 shadow-none"
+        className="hidden md:flex h-10 w-10 items-center justify-center bg-transparent text-text hover:scale-110 transition-transform focus-visible:outline-none p-0 border-0 shadow-none"
       >
         <span className="text-2xl drop-shadow-sm" aria-hidden="true">
           💬

@@ -72,14 +72,6 @@ export function FilterBar({
         </FacetGroup>
       )}
 
-      <FacetGroup label={t("facet.price")}>
-        {PRICE_BANDS.map((b) => (
-          <Chip key={b.key} active={filters.price === b.key} query={toggle(filters, "price", b.key)} ltr>
-            {t(`price.${b.key}`)}
-          </Chip>
-        ))}
-      </FacetGroup>
-
       {artists.length > 1 && (
         <FacetGroup label={t("facet.artist")}>
           {artists.map((a) => (

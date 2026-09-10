@@ -87,7 +87,7 @@ function ArtworkDetail({ artwork, otherArtworks }: { artwork: Artwork; otherArtw
   }));
 
   return (
-    <main className="mx-auto max-w-[var(--container-content)] px-6 py-8 md:px-12 md:py-12 lg:px-16">
+    <main className="mx-auto max-w-[var(--container-content)] px-6 py-8 pb-28 md:px-12 md:py-12 md:pb-12 lg:px-16">
       <Breadcrumb category={medium} title={artwork.title[locale] || artwork.title.he} bc={bc} />
 
       {/* Desktop: image (end/left) + purchase panel (start/right). Mobile: image first. */}

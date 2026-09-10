@@ -9,7 +9,6 @@ import { AuthProvider } from "@/components/auth/auth-context";
 import { AuthModal } from "@/components/auth/auth-modal";
 import { AccessibilityWidget } from "@/components/ui/accessibility-widget";
 import { SupportChatWidget } from "@/components/ui/support-chat-widget";
-import { MobileBottomNav } from "@/components/layout/mobile-bottom-nav";
 import "../globals.css";
 
 type LayoutParams = { locale: string };
@@ -25,16 +24,16 @@ export async function generateMetadata({
   params: Promise<LayoutParams>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "Meta" });
+  const activeLocale: Locale = hasLocale(routing.locales, locale)
+    ? (locale as Locale)
+    : routing.defaultLocale;
+  const t = await getTranslations({ locale: activeLocale, namespace: "Meta" });
 
-  // metadataBase turns every page's relative canonical/hreflang into absolute
-  // URLs. Default alternates are the home page's; each page overrides via
-  // seoAlternates (x-default -> Hebrew, DECISIONS §2 #10).
   return {
     metadataBase: new URL(SITE_URL),
     title: t("title"),
     description: t("description"),
-    alternates: seoAlternates(locale as Locale, "/"),
+    alternates: seoAlternates(activeLocale, "/"),
   };
 }
 
@@ -47,26 +46,26 @@ export default async function LocaleLayout({
 }) {
   const { locale } = await params;
 
-  // Reject any locale not in the configured set.
-  if (!hasLocale(routing.locales, locale)) {
-    notFound();
-  }
+  // Fallback to defaultLocale (he) if locale param is unprefixed route (e.g. /upload, /account),
+  // preventing false 404s while preserving full Hebrew and English locale support.
+  const activeLocale: Locale = hasLocale(routing.locales, locale)
+    ? (locale as Locale)
+    : routing.defaultLocale;
 
   // Enable static rendering for this request (next-intl requirement).
-  setRequestLocale(locale);
+  setRequestLocale(activeLocale);
 
-  const dir = localeDirection[locale as Locale];
+  const dir = localeDirection[activeLocale];
 
   return (
-    <html lang={locale} dir={dir}>
+    <html lang={activeLocale} dir={dir}>
       <body className={fontVariables}>
-        <NextIntlClientProvider>
+        <NextIntlClientProvider locale={activeLocale}>
           <AuthProvider>
-            <div className="pb-16 md:pb-0">{children}</div>
+            <div>{children}</div>
             <AuthModal />
             <AccessibilityWidget />
             <SupportChatWidget />
-            <MobileBottomNav />
           </AuthProvider>
         </NextIntlClientProvider>
       </body>

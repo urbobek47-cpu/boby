@@ -98,10 +98,7 @@ function CatalogueView({
         <p className="max-w-[var(--container-prose)] text-text-muted">{t("intro")}</p>
       </header>
 
-      {/* Instagram Stories Bar */}
-      <div className="mt-4 border-b border-border/60 pb-2">
-        <StoriesBar />
-      </div>
+
 
       {/* Search Intent Badges & Artist Feature Highlights */}
       {searchInfo && (

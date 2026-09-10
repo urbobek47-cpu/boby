@@ -98,10 +98,7 @@ function CatalogueView({
         <p className="max-w-[var(--container-prose)] text-text-muted">{t("intro")}</p>
       </header>
 
-      {/* Instagram Stories Bar */}
-      <div className="mt-4 border-b border-border/60 pb-2">
-        <StoriesBar />
-      </div>
+
 
       {/* Search Intent Badges & Artist Feature Highlights */}
       {searchInfo && (
@@ -165,7 +162,7 @@ function CatalogueView({
       {filtered.length > 0 ? (
         <ul
           role="list"
-          className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-2 md:grid-cols-3 md:gap-x-6 md:gap-y-10"
+          className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 md:gap-x-6 md:gap-y-10"
         >
           {filtered.map((artwork, index) => (
             <React.Fragment key={artwork.slug}>
@@ -174,7 +171,7 @@ function CatalogueView({
               </li>
               {/* Interspersed Story Card every 5 items */}
               {(index + 1) % 5 === 0 && artwork.artist && (
-                <li className="col-span-2 md:col-span-3">
+                <li className="col-span-2 md:col-span-3 xl:col-span-4">
                   <ArtistSpotlightCard artist={artwork.artist} />
                 </li>
               )}

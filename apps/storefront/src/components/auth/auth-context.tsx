@@ -12,6 +12,7 @@ export interface User {
   phone?: string;
   studioName?: string;
   discipline?: string;
+  avatarUrl?: string;
 }
 
 interface AuthContextType {

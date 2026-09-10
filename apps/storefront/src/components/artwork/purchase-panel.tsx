@@ -80,13 +80,13 @@ export function PurchasePanel({ artwork }: { artwork: Artwork }) {
 
       <p className="text-caption text-text-muted">{t("returns")} · {t("colorNote")}</p>
 
-      {/* Mobile Sticky Bottom Purchase Bar (Screen width < 768px) */}
-      <div className="fixed bottom-16 start-0 end-0 z-30 flex items-center justify-between gap-4 border-t border-border bg-surface/95 px-5 py-3 shadow-lg backdrop-blur-md md:hidden">
+      {/* Mobile Sticky Bottom Purchase Bar (Screen width < 768px) - Flush at bottom-0 */}
+      <div className="fixed bottom-0 start-0 end-0 z-40 flex items-center justify-between gap-4 border-t border-border bg-surface px-5 py-3.5 pb-[max(0.875rem,env(safe-area-inset-bottom))] shadow-[0_-4px_16px_rgba(0,0,0,0.08)] backdrop-blur-md md:hidden">
         <div className="flex flex-col">
           <span className="text-caption text-text-muted">מחיר כולל מע״מ</span>
           <Price agorot={artwork.priceAgorot} className="text-body font-bold text-text" />
         </div>
-        <Button variant="primary" className="px-5 py-2 text-small">
+        <Button variant="primary" className="px-5 py-2.5 text-small font-medium shadow-sm">
           {artwork.inventoryKind === "MADE_TO_ORDER" ? "להזמנה לפי מידה" : "הוספה לסל"}
         </Button>
       </div>
