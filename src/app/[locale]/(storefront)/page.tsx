@@ -57,11 +57,11 @@ function Home({
       {/* Hero Section */}
       <section className="mx-auto max-w-[var(--container-content)] px-3 pt-3 sm:px-4 md:px-8 md:pt-4">
         {/* Integrated Clean Hero Banner */}
-        <div className="relative aspect-[1024/180] max-h-[110px] sm:max-h-[145px] md:max-h-[175px] w-full overflow-hidden rounded-panel shadow-[var(--shadow-soft)] group">
+        <div className="relative aspect-[1024/220] max-h-[135px] sm:max-h-[185px] md:max-h-[220px] w-full overflow-hidden rounded-panel bg-[#F4F1EA] shadow-[var(--shadow-soft)] group flex items-center justify-center">
           <img
             src="/images/boby-hero-wood-clean.png"
             alt="BOBY — לוגו עץ מגולף בעבודת יד"
-            className="w-full h-full object-cover object-center"
+            className="w-full h-full object-contain object-center p-1 sm:p-2"
             loading="eager"
           />
         </div>
