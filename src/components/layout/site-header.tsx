@@ -44,12 +44,6 @@ export function SiteHeader() {
           {/* User Profile & Actions */}
           <div className="flex items-center gap-1 sm:gap-2 text-small shrink-0">
             <Link
-              href="/works"
-              className="hidden md:inline-flex rounded-full bg-sand px-3 py-1.5 text-small font-medium text-text hover:bg-stone/60 transition-colors"
-            >
-              {t("works")}
-            </Link>
-            <Link
               href="/upload"
               className="hidden lg:inline-flex items-center gap-1 rounded-full bg-accent-strong px-3 py-1.5 text-small font-medium text-surface hover:bg-accent-hover transition-colors shadow-sm"
             >
