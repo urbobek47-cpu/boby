@@ -71,7 +71,7 @@ function Home({
       <HebrewSeparatorBanner />
 
       {/* Immediately Artwork Gallery */}
-      <section id="gallery" className="mx-auto mt-4 sm:mt-5 md:mt-6 max-w-[var(--container-content)] px-4 sm:px-6 md:px-10 lg:px-14 xl:px-16">
+      <section id="gallery" className="mx-auto mt-8 sm:mt-10 md:mt-14 lg:mt-16 max-w-[var(--container-content)] px-4 sm:px-6 md:px-10 lg:px-14 xl:px-16">
         <PinterestMasonryGrid
           artworks={allArtworks}
           featuredArtist={artist}
