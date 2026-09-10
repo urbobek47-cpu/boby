@@ -459,22 +459,7 @@ const artworks: Artwork[] = [
     images: [{ publicId: "https://images.unsplash.com/photo-1581783342308-f792dbdd27c5?auto=format&fit=crop&w=1000&q=80", aspectRatio: 0.75, role: "primary", caption: { he: "אגרטל ראקו גבוה", en: "Tall Raku vase" } }],
     artist: adiNavon,
   },
-  {
-    slug: "art-ceramics-wide-platter",
-    title: { he: "מגש קרמיקה מרובע", en: "Square Sculptural Platter" },
-    story: { he: "מגש הגשה שטוח בגלזורת חול מוברשת למרכז שולחן.", en: "Flat square serving platter in brushed sand glaze." },
-    materials: { he: ["חימר לבן"], en: ["White clay"] },
-    discipline: "ceramics",
-    category: { he: "קרמיקה", en: "Ceramics" },
-    inventoryKind: "UNIQUE",
-    availability: "available",
-    dimensions: { heightCm: 4, widthCm: 34, depthCm: 34, weightGrams: 1800 },
-    priceAgorot: 39000,
-    shippingSizeBand: "MEDIUM",
-    isFragile: true,
-    images: [{ publicId: "https://images.unsplash.com/photo-1590736704728-f4730bb30770?auto=format&fit=crop&w=1000&q=80", aspectRatio: 1.33, role: "primary", caption: { he: "מגש קרמיקה מרובע", en: "Square ceramic platter" } }],
-    artist: giladOren,
-  },
+
   {
     slug: "art-ceramics-terracotta-jar",
     title: { he: "כד טרקוטה גלילי", en: "Galilean Terracotta Jar" },
