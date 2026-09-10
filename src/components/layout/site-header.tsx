@@ -37,7 +37,7 @@ export function SiteHeader() {
           </div>
 
           {/* Pinterest-Style Rounded Search Bar */}
-          <div className="flex flex-1 items-center max-w-xl mx-1 sm:mx-2 md:mx-6 min-w-0">
+          <div className="flex items-center sm:flex-1 sm:max-w-xl mx-0.5 sm:mx-2 md:mx-6 min-w-0">
             <HeaderSearchBar placeholder="חפש אמנים או יצירות..." />
           </div>
 
