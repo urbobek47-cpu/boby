@@ -102,13 +102,13 @@ export function PinterestMasonryGrid({
   return (
     <>
       {/* Mobile 2-Column Explicit Flex Layout */}
-      <div className="flex md:hidden flex-row gap-5 w-full items-start">
-        <div className="flex flex-col gap-5 flex-1 min-w-0">
+      <div className="flex md:hidden flex-row gap-6 w-full items-start">
+        <div className="flex flex-col gap-6 flex-1 min-w-0">
           {mobileCols[0].map((item, idx) => (
             <React.Fragment key={idx}>{item}</React.Fragment>
           ))}
         </div>
-        <div className="flex flex-col gap-5 flex-1 min-w-0">
+        <div className="flex flex-col gap-6 flex-1 min-w-0">
           {mobileCols[1].map((item, idx) => (
             <React.Fragment key={idx}>{item}</React.Fragment>
           ))}
@@ -116,18 +116,18 @@ export function PinterestMasonryGrid({
       </div>
 
       {/* Tablet 3-Column Explicit Flex Layout (768px - 1280px) */}
-      <div className="hidden md:flex xl:hidden flex-row gap-7 w-full items-start">
-        <div className="flex flex-col gap-7 flex-1 min-w-0">
+      <div className="hidden md:flex xl:hidden flex-row gap-9 w-full items-start">
+        <div className="flex flex-col gap-9 flex-1 min-w-0">
           {tabletCols[0].map((item, idx) => (
             <React.Fragment key={idx}>{item}</React.Fragment>
           ))}
         </div>
-        <div className="flex flex-col gap-7 flex-1 min-w-0">
+        <div className="flex flex-col gap-9 flex-1 min-w-0">
           {tabletCols[1].map((item, idx) => (
             <React.Fragment key={idx}>{item}</React.Fragment>
           ))}
         </div>
-        <div className="flex flex-col gap-7 flex-1 min-w-0">
+        <div className="flex flex-col gap-9 flex-1 min-w-0">
           {tabletCols[2].map((item, idx) => (
             <React.Fragment key={idx}>{item}</React.Fragment>
           ))}
@@ -135,23 +135,23 @@ export function PinterestMasonryGrid({
       </div>
 
       {/* Widescreen 15"+ Desktop 4-Column Explicit Flex Layout (>=1280px) */}
-      <div className="hidden xl:flex flex-row gap-9 w-full items-start">
-        <div className="flex flex-col gap-9 flex-1 min-w-0">
+      <div className="hidden xl:flex flex-row gap-12 w-full items-start">
+        <div className="flex flex-col gap-12 flex-1 min-w-0">
           {desktopCols[0].map((item, idx) => (
             <React.Fragment key={idx}>{item}</React.Fragment>
           ))}
         </div>
-        <div className="flex flex-col gap-9 flex-1 min-w-0">
+        <div className="flex flex-col gap-12 flex-1 min-w-0">
           {desktopCols[1].map((item, idx) => (
             <React.Fragment key={idx}>{item}</React.Fragment>
           ))}
         </div>
-        <div className="flex flex-col gap-9 flex-1 min-w-0">
+        <div className="flex flex-col gap-12 flex-1 min-w-0">
           {desktopCols[2].map((item, idx) => (
             <React.Fragment key={idx}>{item}</React.Fragment>
           ))}
         </div>
-        <div className="flex flex-col gap-9 flex-1 min-w-0">
+        <div className="flex flex-col gap-12 flex-1 min-w-0">
           {desktopCols[3].map((item, idx) => (
             <React.Fragment key={idx}>{item}</React.Fragment>
           ))}
