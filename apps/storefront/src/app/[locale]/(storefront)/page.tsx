@@ -90,10 +90,10 @@ function Home({
 function HebrewSeparatorBanner() {
   return (
     <section className="mx-auto max-w-[var(--container-content)] px-3 pt-3 sm:px-4 md:px-8 sm:pt-3 md:pt-4">
-      <div className="relative w-full overflow-hidden rounded-panel bg-[#F4F1EA] border border-stone/30 shadow-[var(--shadow-soft)]">
+      <div className="relative w-full overflow-hidden rounded-panel bg-[#8A5335] border border-[#6F4229]/30 shadow-[var(--shadow-soft)]">
         {/* Centered Hebrew Text */}
-        <div className="flex items-center justify-center px-4 py-3 sm:py-4 md:py-4 text-center">
-          <h2 className="font-serif font-medium tracking-wide text-deep text-[clamp(0.95rem,2vw,1.35rem)] leading-snug">
+        <div className="flex items-center justify-center px-4 py-3.5 sm:py-4 md:py-5 text-center">
+          <h2 className="font-serif font-medium tracking-wide text-[#FAF7F2] text-[clamp(1rem,2.2vw,1.4rem)] leading-snug">
             כל פריט עם סיפור מאחוריו
           </h2>
         </div>
