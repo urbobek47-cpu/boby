@@ -184,6 +184,31 @@ export function CategoryDrawer() {
               <span className="text-caption font-semibold text-accent-strong">←</span>
             </Link>
 
+            {/* 2. Upload Artwork / העלאת יצירה */}
+            <Link
+              href="/upload"
+              onClick={() => setIsOpen(false)}
+              className="flex items-center justify-between rounded-panel border border-accent-strong/40 bg-sand/80 p-3.5 transition-all hover:border-accent-strong hover:bg-sand"
+            >
+              <div className="flex items-center gap-3">
+                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-accent-strong text-surface shadow-sm">
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                  </svg>
+                </span>
+                <div>
+                  <p className="flex items-center gap-1.5 text-small font-semibold text-text">
+                    העלאת יצירה חדשה
+                    <span className="text-[10px] font-bold text-surface bg-accent-strong px-2 py-0.5 rounded-full">
+                      אזור אמן
+                    </span>
+                  </p>
+                  <p className="text-caption text-text-muted">העלאת עבודה חדשה לגלריית BOBY</p>
+                </div>
+              </div>
+              <span className="text-caption font-semibold text-accent-strong">←</span>
+            </Link>
+
             {/* 2. Shopping Cart (עגלת קניות / סל) */}
             <div
               className="flex items-center justify-between rounded-panel border border-border/80 bg-surface p-3.5 transition-all hover:border-accent-strong hover:bg-sand cursor-pointer"

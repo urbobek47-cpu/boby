@@ -58,12 +58,66 @@ export function CategoryDrawer() {
   }, [isOpen]);
 
   const categories = [
-    { title: "כל היצירות", href: "/works", icon: "✨", count: "54 יצירות" },
-    { title: "קרמיקה וקדרות", href: { pathname: "/works", query: { category: "ceramics" } }, icon: "🏺", count: "כלים פיסוליים וגלזורות" },
-    { title: "הדפס, איור וציור", href: { pathname: "/works", query: { category: "prints" } }, icon: "🖼️", count: "מהדורות ממוספרות" },
-    { title: "עיבוד עץ וטקסטיל", href: { pathname: "/works", query: { category: "wood" } }, icon: "🪵", count: "אגוז, זית ואריגה" },
-    { title: "צורפות ותכשיטים", href: { pathname: "/works", query: { category: "jewelry" } }, icon: "💍", count: "כסף טהור וזהב" },
-    { title: "מתנות לעסקים וארגונים", href: "/business", icon: "🎁", count: "מארזים ואוצרות" },
+    {
+      title: "כל היצירות",
+      href: "/works",
+      count: "54 יצירות",
+      icon: (
+        <svg className="h-5 w-5 text-text" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
+        </svg>
+      ),
+    },
+    {
+      title: "קרמיקה וקדרות",
+      href: { pathname: "/works", query: { category: "ceramics" } },
+      count: "כלים פיסוליים וגלזורות",
+      icon: (
+        <svg className="h-5 w-5 text-text" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 3.104v1.244c0 .892-.506 1.7-1.306 2.091l-1.07.535A4.453 4.453 0 005 10.957v3.293a6.75 6.75 0 0014 0v-3.293a4.453 4.453 0 00-2.374-3.983l-1.07-.535a2.333 2.333 0 01-1.306-2.091V3.104M8.25 3h7.5M12 21v-3" />
+        </svg>
+      ),
+    },
+    {
+      title: "הדפס, איור וציור",
+      href: { pathname: "/works", query: { category: "prints" } },
+      count: "מהדורות ממוספרות",
+      icon: (
+        <svg className="h-5 w-5 text-text" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+        </svg>
+      ),
+    },
+    {
+      title: "עיבוד עץ וטקסטיל",
+      href: { pathname: "/works", query: { category: "wood" } },
+      count: "אגוז, זית ואריגה",
+      icon: (
+        <svg className="h-5 w-5 text-text" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M6.429 9.75L2.25 12l4.179 2.25m0-4.5l5.571 3 5.571-3m-11.142 0L12 7.5l5.571 2.25M6.429 14.25L12 17.25l5.571-3m0 0L21.75 12l-4.179-2.25" />
+        </svg>
+      ),
+    },
+    {
+      title: "צורפות ותכשיטים",
+      href: { pathname: "/works", query: { category: "jewelry" } },
+      count: "כסף טהור וזהב",
+      icon: (
+        <svg className="h-5 w-5 text-text" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 2.25l7.5 7.5-7.5 12-7.5-12 7.5-7.5zM4.5 9.75h15" />
+        </svg>
+      ),
+    },
+    {
+      title: "מתנות לעסקים וארגונים",
+      href: "/business",
+      count: "מארזים ואוצרות",
+      icon: (
+        <svg className="h-5 w-5 text-text" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M21 11.25v8.25a1.5 1.5 0 01-1.5 1.5H4.5a1.5 1.5 0 01-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 109.375 7.5H12m0-2.625A2.625 2.625 0 1114.625 7.5H12m0 0v13.5m-7.5-13.5h15a.75.75 0 01.75.75v3a.75.75 0 01-.75.75h-15a.75.75 0 01-.75-.75v-3a.75.75 0 01.75-.75z" />
+        </svg>
+      ),
+    },
   ];
 
   const drawerContent = isOpen && (
@@ -117,12 +171,39 @@ export function CategoryDrawer() {
               className="flex items-center justify-between rounded-panel border border-border/80 bg-surface p-3.5 transition-all hover:border-accent-strong hover:bg-sand"
             >
               <div className="flex items-center gap-3">
-                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-sand text-lg">
-                  🏡
+                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-sand text-text">
+                  <svg className="h-5 w-5 text-text" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                  </svg>
                 </span>
                 <div>
                   <p className="text-small font-semibold text-text">גלה (עמוד הבית)</p>
                   <p className="text-caption text-text-muted">חזרה לגלריה הראשית</p>
+                </div>
+              </div>
+              <span className="text-caption font-semibold text-accent-strong">←</span>
+            </Link>
+
+            {/* 2. Upload Artwork / העלאת יצירה */}
+            <Link
+              href="/upload"
+              onClick={() => setIsOpen(false)}
+              className="flex items-center justify-between rounded-panel border border-accent-strong/40 bg-sand/80 p-3.5 transition-all hover:border-accent-strong hover:bg-sand"
+            >
+              <div className="flex items-center gap-3">
+                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-accent-strong text-surface shadow-sm">
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                  </svg>
+                </span>
+                <div>
+                  <p className="flex items-center gap-1.5 text-small font-semibold text-text">
+                    העלאת יצירה חדשה
+                    <span className="text-[10px] font-bold text-surface bg-accent-strong px-2 py-0.5 rounded-full">
+                      אזור אמן
+                    </span>
+                  </p>
+                  <p className="text-caption text-text-muted">העלאת עבודה חדשה לגלריית BOBY</p>
                 </div>
               </div>
               <span className="text-caption font-semibold text-accent-strong">←</span>
@@ -133,8 +214,10 @@ export function CategoryDrawer() {
               className="flex items-center justify-between rounded-panel border border-border/80 bg-surface p-3.5 transition-all hover:border-accent-strong hover:bg-sand cursor-pointer"
             >
               <div className="flex items-center gap-3">
-                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-sand text-lg">
-                  🛒
+                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-sand text-text">
+                  <svg className="h-5 w-5 text-text" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.25 10.5a.75.75 0 100-1.5.75.75 0 000 1.5zm7.5 0a.75.75 0 100-1.5.75.75 0 000 1.5z" />
+                  </svg>
                 </span>
                 <div>
                   <p className="flex items-center gap-1.5 text-small font-semibold text-text">
@@ -149,15 +232,17 @@ export function CategoryDrawer() {
               <span className="text-caption font-semibold text-accent-strong">←</span>
             </div>
 
-            {/* 3. Liked Artworks (יצירות אהובות ❤️) */}
+            {/* 3. Liked Artworks (יצירות אהובות) */}
             <Link
               href={{ pathname: "/account", query: { tab: "saved" } }}
               onClick={() => setIsOpen(false)}
               className="flex items-center justify-between rounded-panel border border-border/80 bg-surface p-3.5 transition-all hover:border-accent-strong hover:bg-sand"
             >
               <div className="flex items-center gap-3">
-                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-sand text-lg">
-                  ❤️
+                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-sand text-text">
+                  <svg className="h-5 w-5 text-text" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+                  </svg>
                 </span>
                 <div>
                   <p className="flex items-center gap-1.5 text-small font-semibold text-text">
@@ -204,8 +289,10 @@ export function CategoryDrawer() {
                 className="flex items-center justify-between rounded-panel border border-border/80 bg-surface p-3.5 text-start transition-all hover:border-accent-strong hover:bg-sand"
               >
                 <div className="flex items-center gap-3">
-                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-sand text-lg">
-                    🔑
+                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-sand text-text">
+                    <svg className="h-5 w-5 text-text" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                    </svg>
                   </span>
                   <div>
                     <p className="text-small font-semibold text-text">התחברות / הרשמה</p>
@@ -226,8 +313,10 @@ export function CategoryDrawer() {
               className="flex items-center justify-between rounded-panel border border-border/80 bg-surface p-3.5 text-start transition-all hover:border-accent-strong hover:bg-sand"
             >
               <div className="flex items-center gap-3">
-                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-sand text-lg">
-                  💬
+                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-sand text-text">
+                  <svg className="h-5 w-5 text-text" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.008v.008h.008V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm3 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.008v.008h.008V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm3 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.008v.008h.008V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM12 2.25c-5.385 0-9.75 3.582-9.75 8 0 2.455 1.34 4.654 3.447 6.136-.2.87-.665 2.158-1.573 3.328a.375.375 0 00.37.587 9.87 9.87 0 004.887-1.393A10.835 10.835 0 0012 18.25c5.385 0 9.75-3.582 9.75-8s-4.365-8-9.75-8z" />
+                  </svg>
                 </span>
                 <div>
                   <p className="text-small font-semibold text-text">תמיכה ושירות לקוחות</p>
@@ -252,7 +341,7 @@ export function CategoryDrawer() {
                 className="group flex items-center justify-between rounded-panel border border-border/80 bg-sand/30 p-3.5 transition-all hover:border-accent-strong hover:bg-sand shrink-0"
               >
                 <div className="flex items-center gap-3">
-                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-surface text-lg shadow-sm">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-surface text-text shadow-sm border border-stone/20">
                     {cat.icon}
                   </span>
                   <div>
@@ -277,8 +366,10 @@ export function CategoryDrawer() {
 
             <div className="rounded-panel border border-border/80 bg-sand/60 p-4 flex flex-col gap-3">
               <div className="flex items-center gap-2.5">
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-surface text-base shadow-sm shrink-0">
-                  ✉️
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-surface text-text shadow-sm border border-stone/20 shrink-0">
+                  <svg className="h-4 w-4 text-text" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25H4.5a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5H4.5a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                  </svg>
                 </span>
                 <div>
                   <p className="text-small font-semibold text-text">רוצים להישאר בקשר ולקבל עדכונים?</p>

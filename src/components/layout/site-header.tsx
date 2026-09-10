@@ -50,6 +50,12 @@ export function SiteHeader() {
               {t("works")}
             </Link>
             <Link
+              href="/upload"
+              className="hidden lg:inline-flex items-center gap-1 rounded-full bg-accent-strong px-3 py-1.5 text-small font-medium text-surface hover:bg-accent-hover transition-colors shadow-sm"
+            >
+              ✨ להעלות יצירה
+            </Link>
+            <Link
               href={{ pathname: "/account", query: { tab: "saved" } }}
               title="יצירות אהובות (מועדפים)"
               className="hidden sm:inline-flex items-center gap-1 rounded-full bg-sand px-2.5 sm:px-3 py-1.5 text-caption sm:text-small font-medium text-text hover:bg-stone/60 transition-colors"
