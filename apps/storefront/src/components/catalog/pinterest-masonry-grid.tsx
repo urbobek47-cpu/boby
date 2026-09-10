@@ -102,13 +102,13 @@ export function PinterestMasonryGrid({
   return (
     <>
       {/* Mobile 2-Column Explicit Flex Layout */}
-      <div className="flex md:hidden flex-row gap-4 w-full items-start">
-        <div className="flex flex-col gap-4 flex-1 min-w-0">
+      <div className="flex md:hidden flex-row gap-5 w-full items-start">
+        <div className="flex flex-col gap-5 flex-1 min-w-0">
           {mobileCols[0].map((item, idx) => (
             <React.Fragment key={idx}>{item}</React.Fragment>
           ))}
         </div>
-        <div className="flex flex-col gap-4 flex-1 min-w-0">
+        <div className="flex flex-col gap-5 flex-1 min-w-0">
           {mobileCols[1].map((item, idx) => (
             <React.Fragment key={idx}>{item}</React.Fragment>
           ))}
@@ -116,18 +116,18 @@ export function PinterestMasonryGrid({
       </div>
 
       {/* Tablet 3-Column Explicit Flex Layout (768px - 1280px) */}
-      <div className="hidden md:flex xl:hidden flex-row gap-6 w-full items-start">
-        <div className="flex flex-col gap-6 flex-1 min-w-0">
+      <div className="hidden md:flex xl:hidden flex-row gap-7 w-full items-start">
+        <div className="flex flex-col gap-7 flex-1 min-w-0">
           {tabletCols[0].map((item, idx) => (
             <React.Fragment key={idx}>{item}</React.Fragment>
           ))}
         </div>
-        <div className="flex flex-col gap-6 flex-1 min-w-0">
+        <div className="flex flex-col gap-7 flex-1 min-w-0">
           {tabletCols[1].map((item, idx) => (
             <React.Fragment key={idx}>{item}</React.Fragment>
           ))}
         </div>
-        <div className="flex flex-col gap-6 flex-1 min-w-0">
+        <div className="flex flex-col gap-7 flex-1 min-w-0">
           {tabletCols[2].map((item, idx) => (
             <React.Fragment key={idx}>{item}</React.Fragment>
           ))}
@@ -135,23 +135,23 @@ export function PinterestMasonryGrid({
       </div>
 
       {/* Widescreen 15"+ Desktop 4-Column Explicit Flex Layout (>=1280px) */}
-      <div className="hidden xl:flex flex-row gap-8 w-full items-start">
-        <div className="flex flex-col gap-8 flex-1 min-w-0">
+      <div className="hidden xl:flex flex-row gap-9 w-full items-start">
+        <div className="flex flex-col gap-9 flex-1 min-w-0">
           {desktopCols[0].map((item, idx) => (
             <React.Fragment key={idx}>{item}</React.Fragment>
           ))}
         </div>
-        <div className="flex flex-col gap-8 flex-1 min-w-0">
+        <div className="flex flex-col gap-9 flex-1 min-w-0">
           {desktopCols[1].map((item, idx) => (
             <React.Fragment key={idx}>{item}</React.Fragment>
           ))}
         </div>
-        <div className="flex flex-col gap-8 flex-1 min-w-0">
+        <div className="flex flex-col gap-9 flex-1 min-w-0">
           {desktopCols[2].map((item, idx) => (
             <React.Fragment key={idx}>{item}</React.Fragment>
           ))}
         </div>
-        <div className="flex flex-col gap-8 flex-1 min-w-0">
+        <div className="flex flex-col gap-9 flex-1 min-w-0">
           {desktopCols[3].map((item, idx) => (
             <React.Fragment key={idx}>{item}</React.Fragment>
           ))}
@@ -182,9 +182,9 @@ function ArtworkMasonryCard({
   const avatarImgSrc = getOptimizedImageUrl(artist.portraitPublicId, 100, 75);
 
   return (
-    <div className="group relative overflow-hidden rounded-[14px] bg-surface shadow-[var(--shadow-soft)] transition-all duration-300 hover:shadow-md border border-stone/40 flex flex-col w-full">
-      {/* Top-Left Corner Heart Button: Hidden by default, visible on hover */}
-      <div className="absolute top-3 left-3 z-30 pointer-events-auto opacity-0 group-hover:opacity-100 transition-opacity duration-200"> {/* logical-ok */}
+    <div className="group relative overflow-hidden rounded-[12px] bg-surface shadow-[var(--shadow-soft)] transition-all duration-300 hover:shadow-md border border-stone/40 flex flex-col w-full">
+      {/* Top-Start Corner Heart Button: Hidden by default, visible on hover */}
+      <div className="absolute top-2.5 start-2.5 z-30 pointer-events-auto opacity-0 group-hover:opacity-100 transition-opacity duration-200">
         <LikeButton slug={artwork.slug} title={artworkTitle} />
       </div>
 
@@ -206,42 +206,42 @@ function ArtworkMasonryCard({
               decoding="async"
             />
           ) : (
-            <div className="flex h-56 w-full items-center justify-center bg-stone/30 text-text-muted text-small">
+            <div className="flex h-48 w-full items-center justify-center bg-stone/30 text-text-muted text-small">
               🎨 {artwork.category[locale] || artwork.category.he}
             </div>
           )}
         </div>
 
         {/* Permanent Text Info Container directly beneath image in earthy brown tone (#E5D8C8) */}
-        <div className="p-3 sm:p-3.5 flex flex-col gap-1.5 bg-[#E5D8C8] border-t border-[#D5C4B1] shrink-0 w-full mt-auto">
+        <div className="p-2.5 sm:p-3 flex flex-col gap-1 bg-[#E5D8C8] border-t border-[#D5C4B1] shrink-0 w-full mt-auto">
           <div className="flex items-baseline justify-between gap-2">
-            <h3 className="text-small sm:text-body font-medium text-[#2A211E] group-hover:text-accent-strong truncate">
+            <h3 className="text-xs sm:text-small font-medium text-[#2A211E] group-hover:text-accent-strong truncate">
               {artworkTitle}
             </h3>
-            <Price agorot={artwork.priceAgorot} className="text-small sm:text-body font-semibold text-[#2A211E] shrink-0" />
+            <Price agorot={artwork.priceAgorot} className="text-xs sm:text-small font-semibold text-[#2A211E] shrink-0" />
           </div>
 
           <div className="flex items-center justify-between gap-2 text-caption text-[#5C483A]">
-            <div className="flex items-center gap-2 min-w-0">
+            <div className="flex items-center gap-1.5 min-w-0">
               {avatarImgSrc ? (
                 <img
                   src={avatarImgSrc}
                   alt={artistName}
-                  className="h-5 w-5 sm:h-6 sm:w-6 rounded-full object-cover border border-[#C8B8A6] shrink-0"
+                  className="h-4.5 w-4.5 sm:h-5 sm:w-5 rounded-full object-cover border border-[#C8B8A6] shrink-0"
                   loading={isEager ? "eager" : "lazy"}
                   decoding="async"
                 />
               ) : (
-                <div className="flex h-5 w-5 sm:h-6 sm:w-6 items-center justify-center rounded-full bg-accent-strong text-surface text-[10px] font-bold shrink-0">
+                <div className="flex h-4.5 w-4.5 sm:h-5 sm:w-5 items-center justify-center rounded-full bg-accent-strong text-surface text-[9px] font-bold shrink-0">
                   {artistName.slice(0, 1)}
                 </div>
               )}
-              <span className="truncate font-medium text-[#5C483A]">
+              <span className="truncate font-medium text-[#5C483A] text-[11px] sm:text-caption">
                 <bdi>{artistName}</bdi>
               </span>
             </div>
 
-            <span className="text-[11px] font-medium text-accent-strong group-hover:translate-x-[-2px] transition-transform shrink-0">
+            <span className="text-[10px] font-medium text-accent-strong group-hover:translate-x-[-2px] transition-transform shrink-0">
               ←
             </span>
           </div>
