@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { Link } from "@/i18n/navigation";
 import { Price } from "@/components/catalog/price";
@@ -48,7 +48,7 @@ interface OrderData {
   };
 }
 
-export default function CheckoutSuccessPage() {
+function CheckoutSuccessContent() {
   const searchParams = useSearchParams();
   const queryOrderId = searchParams.get("orderId");
   const [order, setOrder] = useState<OrderData | null>(null);
@@ -221,5 +221,19 @@ export default function CheckoutSuccessPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function CheckoutSuccessPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="mx-auto max-w-[var(--container-content)] px-4 py-16 text-center">
+          <p className="text-text-muted">טוען פרטי הזמנה...</p>
+        </main>
+      }
+    >
+      <CheckoutSuccessContent />
+    </Suspense>
   );
 }
