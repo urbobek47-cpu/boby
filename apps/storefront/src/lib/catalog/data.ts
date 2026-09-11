@@ -862,6 +862,8 @@ const artworks: Artwork[] = [
   },
 ];
 
+export { artworks };
+
 const dynamicArtworksStore: Artwork[] = [];
 
 export function addCustomArtwork(newArtwork: Artwork): void {

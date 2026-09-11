@@ -2,6 +2,10 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 import type { Artwork } from "@/lib/catalog/types";
+import {
+  reserveArtworkAtomic,
+  releaseArtworkAtomic,
+} from "@/lib/orders/reservation-engine";
 
 export interface CartItem {
   artwork: Artwork;
@@ -11,6 +15,7 @@ export interface CartItem {
 }
 
 interface CartContextType {
+  cartId: string;
   items: CartItem[];
   isCartOpen: boolean;
   openCart: () => void;
@@ -31,23 +36,29 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 const CART_STORAGE_KEY = "boby_cart_v1";
-const HOLD_DURATION_MINUTES = 15;
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
+  const [cartId, setCartId] = useState<string>("");
   const [items, setItems] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [notification, setNotification] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
 
-  // Load cart from localStorage on mount
+  // Initialize persistent cartId & load cart from localStorage on mount
   useEffect(() => {
     try {
       if (typeof window !== "undefined") {
+        let storedId = localStorage.getItem("boby_cart_id");
+        if (!storedId) {
+          storedId = `cart_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+          localStorage.setItem("boby_cart_id", storedId);
+        }
+        setCartId(storedId);
+
         const stored = localStorage.getItem(CART_STORAGE_KEY);
         if (stored) {
           const parsed: CartItem[] = JSON.parse(stored);
-          // Filter out expired unique reservations if past 15 min hold
-          const now = new Date().getTime();
+          const now = Date.now();
           const validItems = parsed.filter((item) => {
             if (item.artwork.inventoryKind === "UNIQUE" && item.expiresAt) {
               const expireTime = new Date(item.expiresAt).getTime();
@@ -59,7 +70,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         }
       }
     } catch {
-      // Fallback to empty cart on error
+      // Fallback on error
     } finally {
       setIsInitialized(true);
     }
@@ -82,33 +93,42 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const clearNotification = () => setNotification(null);
 
   const addToCart = (artwork: Artwork): { success: boolean; message?: string } => {
+    const activeCartId = cartId || "guest_cart";
     const existingIndex = items.findIndex((i) => i.artwork.slug === artwork.slug);
 
-    if (artwork.inventoryKind === "UNIQUE") {
-      if (existingIndex > -1) {
-        const msg = "פריט יחיד מסוגו — כבר נמצא בסל הקניות שלך";
-        setNotification(msg);
-        setIsCartOpen(true);
-        return { success: false, message: msg };
-      }
+    if (artwork.inventoryKind === "UNIQUE" && existingIndex > -1) {
+      const msg = "פריט יחיד מסוגו — כבר נמצא בסל הקניות שלך";
+      setNotification(msg);
+      setIsCartOpen(true);
+      return { success: false, message: msg };
+    }
+
+    // Atomic reservation attempt via Spike 4 mechanism
+    const res = reserveArtworkAtomic(artwork.slug, activeCartId, artwork.inventoryKind);
+
+    if (!res.success) {
+      const msg = res.reason || "בסל של מישהו אחר — נסו שוב בעוד כמה דקות";
+      setNotification(msg);
+      setIsCartOpen(true);
+      return { success: false, message: msg };
     }
 
     const now = new Date();
-    const expiresAt = new Date(now.getTime() + HOLD_DURATION_MINUTES * 60 * 1000).toISOString();
+    const expiresAt =
+      res.expiresAt || new Date(now.getTime() + 15 * 60 * 1000).toISOString();
 
     if (existingIndex > -1) {
-      // Increment quantity for non-unique items
       const updated = [...items];
       const currentItem = updated[existingIndex];
-      const maxQty = artwork.inventoryKind === "LIMITED_EDITION" && artwork.editionSize
-        ? artwork.editionSize
-        : 10;
-      
+      const maxQty =
+        artwork.inventoryKind === "LIMITED_EDITION" && artwork.editionSize
+          ? artwork.editionSize
+          : 10;
+
       const newQty = Math.min(currentItem.quantity + 1, maxQty);
       updated[existingIndex] = { ...currentItem, quantity: newQty, expiresAt };
       setItems(updated);
     } else {
-      // New item entry
       setItems((prev) => [
         ...prev,
         {
@@ -126,6 +146,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   };
 
   const removeFromCart = (slug: string) => {
+    const activeCartId = cartId || "guest_cart";
+    releaseArtworkAtomic(slug, activeCartId);
     setItems((prev) => prev.filter((i) => i.artwork.slug !== slug));
   };
 
@@ -138,7 +160,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setItems((prev) =>
       prev.map((item) => {
         if (item.artwork.slug === slug) {
-          // Enforce quantity = 1 for unique artworks
           if (item.artwork.inventoryKind === "UNIQUE") {
             return { ...item, quantity: 1 };
           }
@@ -162,18 +183,23 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   // Calculations in Agorot
   const itemCount = items.reduce((acc, item) => acc + item.quantity, 0);
-  const subtotalAgorot = items.reduce((acc, item) => acc + item.artwork.priceAgorot * item.quantity, 0);
-  
+  const subtotalAgorot = items.reduce(
+    (acc, item) => acc + item.artwork.priceAgorot * item.quantity,
+    0
+  );
+
   // Israeli VAT is 18% inclusive (VAT = Subtotal * 0.18 / 1.18)
   const vatAgorot = Math.round(subtotalAgorot * (0.18 / 1.18));
-  
+
   // Shipping estimate: Free shipping above ₪350 (35,000 agorot), otherwise ₪35 (3,500 agorot)
-  const estimatedShippingAgorot = subtotalAgorot > 0 ? (subtotalAgorot >= 35000 ? 0 : 3500) : 0;
+  const estimatedShippingAgorot =
+    subtotalAgorot > 0 ? (subtotalAgorot >= 35000 ? 0 : 3500) : 0;
   const totalAgorot = subtotalAgorot + estimatedShippingAgorot;
 
   return (
     <CartContext.Provider
       value={{
+        cartId,
         items,
         isCartOpen,
         openCart,

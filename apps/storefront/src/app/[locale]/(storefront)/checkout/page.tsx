@@ -9,12 +9,14 @@ import { useCart } from "@/components/cart/cart-context";
 import { useAuth } from "@/components/auth/auth-context";
 import { Price } from "@/components/catalog/price";
 import { Button } from "@/components/ui/button";
+import { createOrderAtomic } from "@/lib/orders/reservation-engine";
 
 export default function CheckoutPage() {
   const router = useRouter();
   const locale = useLocale() as Locale;
   const { user } = useAuth();
   const {
+    cartId,
     items,
     subtotalAgorot,
     vatAgorot,
@@ -68,16 +70,8 @@ export default function CheckoutPage() {
     setIsSubmitting(true);
 
     try {
-      // Build structured order object (matching BUILD-PLAN.md §4.3 & §4.4)
-      const orderNumber = `BOBY-2026-${Math.floor(1000 + Math.random() * 9000)}`;
-      const orderId = `ord_${Date.now()}`;
-
-      const orderData = {
-        id: orderId,
-        humanReadableNumber: orderNumber,
-        createdAt: new Date().toISOString(),
-        status: "created",
-        paymentStatus: "pending_payment", // Ready for PayPlus integration in Phase 2
+      const result = createOrderAtomic({
+        cartId: cartId || "guest_cart",
         buyer: {
           name: fullName.trim(),
           email: email.trim(),
@@ -115,7 +109,15 @@ export default function CheckoutPage() {
           totalAgorot,
           vatAgorot,
         },
-      };
+      });
+
+      if (!result.success || !result.order) {
+        setFormError(result.reason || "אירעה שגיאה ביצירת ההזמנה. אנא נסו שוב.");
+        setIsSubmitting(false);
+        return;
+      }
+
+      const orderData = result.order;
 
       // Store generated order in sessionStorage for Order Confirmation page
       if (typeof window !== "undefined") {
@@ -126,7 +128,7 @@ export default function CheckoutPage() {
       clearCart();
 
       // Redirect to Order Success Confirmation page
-      router.push(`/checkout/success?orderId=${orderId}`);
+      router.push(`/checkout/success?orderId=${orderData.id}`);
     } catch {
       setFormError("אירעה שגיאה ביצירת ההזמנה. אנא נסו שוב.");
       setIsSubmitting(false);
