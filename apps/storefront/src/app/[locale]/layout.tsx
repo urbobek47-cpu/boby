@@ -7,6 +7,8 @@ import { fontVariables } from "@/fonts";
 import { SITE_URL, seoAlternates } from "@/lib/site";
 import { AuthProvider } from "@/components/auth/auth-context";
 import { AuthModal } from "@/components/auth/auth-modal";
+import { CartProvider } from "@/components/cart/cart-context";
+import { CartDrawer } from "@/components/cart/cart-drawer";
 import { AccessibilityWidget } from "@/components/ui/accessibility-widget";
 import { SupportChatWidget } from "@/components/ui/support-chat-widget";
 import "../globals.css";
@@ -62,10 +64,13 @@ export default async function LocaleLayout({
       <body className={fontVariables}>
         <NextIntlClientProvider locale={activeLocale}>
           <AuthProvider>
-            <div>{children}</div>
-            <AuthModal />
-            <AccessibilityWidget />
-            <SupportChatWidget />
+            <CartProvider>
+              <div>{children}</div>
+              <AuthModal />
+              <CartDrawer />
+              <AccessibilityWidget />
+              <SupportChatWidget />
+            </CartProvider>
           </AuthProvider>
         </NextIntlClientProvider>
       </body>

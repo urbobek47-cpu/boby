@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "@/i18n/navigation";
+import { useCart } from "@/components/cart/cart-context";
 import { useAuth } from "@/components/auth/auth-context";
 import { getLikedSlugs } from "@/components/ui/like-button";
 
@@ -13,6 +14,7 @@ export function CategoryDrawer() {
   const [subscribed, setSubscribed] = useState(false);
   const [likedCount, setLikedCount] = useState(0);
   const { user, openAuthModal } = useAuth();
+  const { itemCount, openCart } = useCart();
 
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
@@ -210,8 +212,13 @@ export function CategoryDrawer() {
             </Link>
 
             {/* 2. Shopping Cart (עגלת קניות / סל) */}
-            <div
-              className="flex items-center justify-between rounded-panel border border-border/80 bg-surface p-3.5 transition-all hover:border-accent-strong hover:bg-sand cursor-pointer"
+            <button
+              type="button"
+              onClick={() => {
+                setIsOpen(false);
+                openCart();
+              }}
+              className="flex w-full items-center justify-between rounded-panel border border-border/80 bg-surface p-3.5 text-start transition-all hover:border-accent-strong hover:bg-sand cursor-pointer"
             >
               <div className="flex items-center gap-3">
                 <span className="flex h-9 w-9 items-center justify-center rounded-full bg-sand text-text">
@@ -223,14 +230,14 @@ export function CategoryDrawer() {
                   <p className="flex items-center gap-1.5 text-small font-semibold text-text">
                     עגלת קניות
                     <span dir="ltr" className="text-caption font-bold text-accent-strong bg-sand px-2 py-0.5 rounded-full border border-stone/30">
-                      (0)
+                      ({itemCount})
                     </span>
                   </p>
-                  <p className="text-caption text-text-muted">סל הקניות שלך (0 פריטים)</p>
+                  <p className="text-caption text-text-muted">סל הקניות שלך ({itemCount} פריטים)</p>
                 </div>
               </div>
               <span className="text-caption font-semibold text-accent-strong">←</span>
-            </div>
+            </button>
 
             {/* 3. Liked Artworks (יצירות אהובות) */}
             <Link
