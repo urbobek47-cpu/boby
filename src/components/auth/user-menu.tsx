@@ -62,14 +62,14 @@ export function UserMenu() {
   return (
     <>
       <div className="flex items-center gap-2">
-        {/* Prominent Upload Artwork button for artists */}
+        {/* Prominent Upload Artwork button for artists (Desktop only) */}
         {isArtist && (
           <Link
             href="/upload"
-            className="flex items-center gap-1 sm:gap-1.5 rounded-control bg-accent px-2 sm:px-3 py-1.5 text-small font-medium text-surface shadow-sm transition-colors hover:bg-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-strong shrink-0"
+            className="hidden sm:flex items-center gap-1 sm:gap-1.5 rounded-control bg-accent px-2 sm:px-3 py-1.5 text-small font-medium text-surface shadow-sm transition-colors hover:bg-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-strong shrink-0"
           >
             <span>✨</span>
-            <span className="hidden sm:inline">להעלות יצירה</span>
+            <span>להעלות יצירה</span>
           </Link>
         )}
 
