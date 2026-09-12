@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { addCustomArtwork } from "@/lib/catalog/data";
 import { registerArtworkInventory } from "@/lib/orders/reservation-engine";
+import { insertArtworkDb } from "@/lib/supabase";
 
 export async function POST(request: Request) {
   try {
@@ -13,8 +14,11 @@ export async function POST(request: Request) {
       );
     }
 
-    // Register artwork in catalog store
+    // Register artwork in catalog store & memory
     addCustomArtwork(artwork);
+
+    // Persist artwork directly in Supabase PostgreSQL database
+    await insertArtworkDb(artwork);
 
     // Register artwork inventory in reservation engine
     registerArtworkInventory(artwork.slug, artwork.inventoryKind, artwork.inventoryKind === "UNIQUE" ? 1 : 10);
@@ -27,3 +31,4 @@ export async function POST(request: Request) {
     );
   }
 }
+

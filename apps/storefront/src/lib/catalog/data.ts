@@ -848,6 +848,8 @@ const artworks: Artwork[] = [
 
 export { artworks };
 
+import { insertArtworkDb, getArtworkBySlugDb, listArtworksDb } from "../supabase";
+
 const dynamicArtworksStore: Artwork[] = [];
 
 export function addCustomArtwork(newArtwork: Artwork): void {
@@ -864,6 +866,10 @@ export function addCustomArtwork(newArtwork: Artwork): void {
   } catch {
     // Ignore storage error
   }
+
+  insertArtworkDb(newArtwork).catch((err) => {
+    console.error("[Supabase Error] Failed async insertArtworkDb:", err);
+  });
 }
 
 function getAllArtworks(): Artwork[] {
@@ -886,30 +892,67 @@ function getAllArtworks(): Artwork[] {
 }
 
 export async function getArtworkBySlug(slug: string): Promise<Artwork | null> {
-  const all = getAllArtworks();
-  return all.find((a) => a.slug === slug) ?? null;
-}
+  const localList = getAllArtworks();
+  const foundLocal = localList.find((a) => a.slug === slug);
+  if (foundLocal) {
+    return foundLocal;
+  }
 
-export async function listArtworkSlugs(): Promise<string[]> {
-  const all = getAllArtworks();
-  return all.map((a) => a.slug);
+  const dbArtwork = await getArtworkBySlugDb(slug);
+  if (dbArtwork) {
+    if (!dynamicArtworksStore.some((a) => a.slug === dbArtwork.slug)) {
+      dynamicArtworksStore.unshift(dbArtwork);
+    }
+    const { registerArtworkInventory } = await import("../orders/reservation-engine");
+    registerArtworkInventory(
+      dbArtwork.slug,
+      dbArtwork.inventoryKind,
+      dbArtwork.inventoryKind === "UNIQUE" ? 1 : 10
+    );
+    return dbArtwork;
+  }
+
+  return null;
 }
 
 export async function listArtworks(): Promise<Artwork[]> {
-  return getAllArtworks();
+  const localList = getAllArtworks();
+  const dbList = await listArtworksDb();
+
+  const combined = [...localList, ...dbList];
+  const uniqueMap = new Map<string, Artwork>();
+  const { registerArtworkInventory } = await import("../orders/reservation-engine");
+  for (const item of combined) {
+    if (!uniqueMap.has(item.slug)) {
+      uniqueMap.set(item.slug, item);
+      registerArtworkInventory(
+        item.slug,
+        item.inventoryKind,
+        item.inventoryKind === "UNIQUE" ? 1 : 10
+      );
+    }
+  }
+  return Array.from(uniqueMap.values());
+}
+
+export async function listArtworkSlugs(): Promise<string[]> {
+  const all = await listArtworks();
+  return all.map((a) => a.slug);
 }
 
 export async function listArtistSlugs(): Promise<string[]> {
-  const all = getAllArtworks();
+  const all = await listArtworks();
   return [...new Set(all.map((a) => a.artist.slug))];
 }
 
 export async function getArtistBySlug(slug: string): Promise<Artist | null> {
-  const all = getAllArtworks();
+  const all = await listArtworks();
   return all.find((a) => a.artist.slug === slug)?.artist ?? null;
 }
 
 export async function listArtworksByArtist(slug: string): Promise<Artwork[]> {
-  const all = getAllArtworks();
+  const all = await listArtworks();
   return all.filter((a) => a.artist.slug === slug);
 }
+
+
