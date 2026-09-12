@@ -65,7 +65,7 @@ export function UserMenu() {
         {/* Prominent Upload Artwork button for artists (Desktop only) */}
         {isArtist && (
           <Link
-            href="/upload"
+            href="/he/upload"
             className="hidden sm:flex items-center gap-1 sm:gap-1.5 rounded-control bg-accent px-2 sm:px-3 py-1.5 text-small font-medium text-surface shadow-sm transition-colors hover:bg-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-strong shrink-0"
           >
             <span>✨</span>
@@ -127,7 +127,7 @@ export function UserMenu() {
 
               {isArtist && (
                 <Link
-                  href="/upload"
+                  href="/he/upload"
                   onClick={() => setIsOpen(false)}
                   className="flex w-full items-center gap-2 rounded-card px-3 py-2 text-start text-caption text-accent-strong font-semibold bg-sand/80 hover:bg-sand transition-colors"
                 >

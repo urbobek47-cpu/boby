@@ -39,7 +39,7 @@ export function SiteHeader() {
           {/* User Profile & Actions */}
           <div className="flex items-center gap-1 sm:gap-2 text-small shrink-0">
             <Link
-              href="/upload"
+              href="/he/upload"
               className="hidden lg:inline-flex items-center gap-1 rounded-full bg-accent-strong px-3 py-1.5 text-small font-medium text-surface hover:bg-accent-hover transition-colors shadow-sm"
             >
               ✨ להעלות יצירה

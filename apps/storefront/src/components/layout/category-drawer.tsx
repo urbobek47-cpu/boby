@@ -188,7 +188,7 @@ export function CategoryDrawer() {
 
             {/* 2. Upload Artwork / העלאת יצירה */}
             <Link
-              href="/upload"
+              href="/he/upload"
               onClick={() => setIsOpen(false)}
               className="flex items-center justify-between rounded-panel border border-accent-strong/40 bg-sand/80 p-3.5 transition-all hover:border-accent-strong hover:bg-sand"
             >
