@@ -326,6 +326,21 @@ export function getArtworkStatus(artworkSlug: string) {
 }
 
 /**
+ * Register a newly published artwork into the inventory store
+ */
+export function registerArtworkInventory(
+  slug: string,
+  inventoryKind: "UNIQUE" | "LIMITED_EDITION" | "MADE_TO_ORDER",
+  quantity: number = 1
+) {
+  inventoryStore.set(slug, {
+    slug,
+    inventoryKind,
+    quantity,
+  });
+}
+
+/**
  * Reset state — helper for automated race tests
  */
 export function resetEngineStore() {

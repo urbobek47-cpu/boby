@@ -1,80 +1,141 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/auth/auth-context";
 import { addCustomArtwork } from "@/lib/catalog/data";
 import { validateArtworkImage } from "@/lib/catalog/image-validation";
-import type { Artwork } from "@/lib/catalog/types";
-import { Link } from "@/i18n/navigation";
+import type { Artwork, Discipline, InventoryKind, ArtworkAvailability, ShippingSizeBand } from "@/lib/catalog/types";
+
+interface SelectedImage {
+  id: string;
+  url: string;
+  file?: File;
+  caption: string;
+  isValidated?: boolean;
+  error?: string;
+}
 
 export function UploadArtworkForm() {
   const { user } = useAuth();
   const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Form Fields
-  const [artistName, setArtistName] = useState(user?.name || "נועה ברק");
+  // Form Fields State
+  const [artistName, setArtistName] = useState(user?.name || "אמן סטודיו BOBY");
   const [title, setTitle] = useState("");
   const [story, setStory] = useState("");
-  const [price, setPrice] = useState("350");
-  const [category, setCategory] = useState("קרמיקה");
-  const [discipline, setDiscipline] = useState<Artwork["discipline"]>("ceramics");
-  const [materials, setMaterials] = useState("חימר מקומי, גלזורה מינרלית");
-  const [heightCm, setHeightCm] = useState("14");
-  const [widthCm, setWidthCm] = useState("22");
-  const [depthCm, setDepthCm] = useState("22");
+  const [price, setPrice] = useState("450");
+  const [categoryLabel, setCategoryLabel] = useState("קרמיקה וקדרות");
+  const [discipline, setDiscipline] = useState<Discipline>("ceramics");
+  const [inventoryKind, setInventoryKind] = useState<InventoryKind>("UNIQUE");
+  const [availability, setAvailability] = useState<ArtworkAvailability>("available");
+  const [materialsInput, setMaterialsInput] = useState("חימר מקומי, גלזורה מינרלית, שריפה כפולה");
+  const [heightCm, setHeightCm] = useState("18");
+  const [widthCm, setWidthCm] = useState("24");
+  const [depthCm, setDepthCm] = useState("24");
+  const [weightGrams, setWeightGrams] = useState("1200");
+  const [shippingBand, setShippingBand] = useState<ShippingSizeBand>("MEDIUM");
+  const [isFragile, setIsFragile] = useState(true);
 
-  // Images state (minimum 2 required)
-  const [selectedImages, setSelectedImages] = useState<
-    Array<{ id: string; url: string; file?: File; caption: string; isValidated?: boolean; error?: string }>
-  >([
+  // Uploaded Images State
+  const [selectedImages, setSelectedImages] = useState<SelectedImage[]>([
     {
-      id: "img-1",
+      id: "img-sample-1",
       url: "/mock/earth-bowl.jpg",
-      caption: "מבט מקיף מזווית עליונה בתאורת רכה",
+      caption: "זווית ראשית של היצירה",
+      isValidated: true,
     },
     {
-      id: "img-2",
+      id: "img-sample-2",
       url: "/mock/evening-bowl.jpg",
-      caption: "תקריב של מרקם הגלזורה ושפת הכלי",
+      caption: "תקריב מרקם וטקסטורה",
+      isValidated: true,
     },
   ]);
 
+  const [isDragOver, setIsDragOver] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
   const [isValidating, setIsValidating] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleAddSampleImage = (type: "valid" | "invalid") => {
+  // Handle Real File Input Selection
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    processFiles(Array.from(files));
+    e.target.value = "";
+  };
+
+  // Process uploaded image files into Data URLs
+  const processFiles = (files: File[]) => {
     setValidationError(null);
-    if (type === "valid") {
-      const newImg = {
-        id: `img-${Date.now()}`,
-        url: selectedImages.length % 2 === 0 ? "/mock/landscape-plate.jpg" : "/mock/olive-goblet.jpg",
-        caption: `תמונה איכותית נוספת (${selectedImages.length + 1})`,
+    const validImageFiles = files.filter((f) => f.type.startsWith("image/"));
+
+    if (validImageFiles.length === 0) {
+      setValidationError("נא לבחור קבצי תמונה בלבד (JPG, PNG, WebP, AVIF).");
+      return;
+    }
+
+    validImageFiles.forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const dataUrl = event.target?.result as string;
+        if (dataUrl) {
+          setSelectedImages((prev) => [
+            ...prev,
+            {
+              id: `img-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+              url: dataUrl,
+              file,
+              caption: file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " "),
+            },
+          ]);
+        }
       };
-      setSelectedImages((prev) => [...prev, newImg]);
-    } else {
-      const invalidImg = {
-        id: `img-${Date.now()}`,
-        url: "/mock/dark-bad-lighting.jpg",
-        caption: "תמונה כהה ולא ממוקדת",
-        error: "התמונה לא עומדת בסטנדרט. אנא העלה תמונה איכותית, עם תאורה טובה ורקע ניטרלי.",
-      };
-      setSelectedImages((prev) => [...prev, invalidImg]);
+      reader.readAsDataURL(file);
+    });
+  };
+
+  // Drag & Drop Handlers
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      processFiles(Array.from(e.dataTransfer.files));
     }
   };
 
+  // Remove image from list
   const handleRemoveImage = (id: string) => {
     setSelectedImages((prev) => prev.filter((img) => img.id !== id));
     setValidationError(null);
   };
 
+  // Update caption
+  const handleUpdateCaption = (id: string, caption: string) => {
+    setSelectedImages((prev) =>
+      prev.map((img) => (img.id === id ? { ...img, caption } : img))
+    );
+  };
+
+  // Form Submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setValidationError(null);
 
     if (selectedImages.length < 2) {
-      setValidationError("יש להעלות לפחות 2 תמונות איכותיות של היצירה.");
+      setValidationError("חובה להעלות לפחות 2 תמונות איכותיות של היצירה.");
       return;
     }
 
@@ -84,12 +145,13 @@ export function UploadArtworkForm() {
     }
 
     if (!story.trim() || story.trim().length < 20) {
-      setValidationError("נא לכתוב את סיפור היצירה והתהליך (לפחות 20 תווים).");
+      setValidationError("נא לכתוב את סיפור היצירה ותהליך העבודה בסטודיו (לפחות 20 תווים).");
       return;
     }
 
     setIsValidating(true);
 
+    // Validate images with AI quality engine
     let hasFailedImage = false;
     const updatedImages = [...selectedImages];
 
@@ -102,7 +164,9 @@ export function UploadArtworkForm() {
         updatedImages[i] = {
           ...img,
           isValidated: false,
-          error: result.reason || "התמונה לא עומדת בסטנדרט. אנא העלה תמונה איכותית, עם תאורה טובה ורקע ניטרלי.",
+          error:
+            result.reason ||
+            "התמונה לא עומדת בסטנדרט. אנא העלו תמונה איכותית בתאורה טובה וברקע ניטרלי.",
         };
       } else {
         updatedImages[i] = {
@@ -117,69 +181,93 @@ export function UploadArtworkForm() {
     setIsValidating(false);
 
     if (hasFailedImage) {
-      setValidationError("אחת או יותר מהתמונות נדחו על ידי מסנן האיכות. אנא החלף אותן בתמונות איכותיות ברקע ניטרלי.");
+      setValidationError(
+        "אחת או יותר מהתמונות נדחו על ידי מסנן האיכות. אנא החליפו אותן בתמונות איכותיות ברקע ניטרלי."
+      );
       return;
     }
 
     setIsSubmitting(true);
 
-    const slug = `${title.trim().toLowerCase().replace(/\s+/g, "-")}-${Date.now().toString().slice(-4)}`;
-    const numericPriceAgorot = Math.round(parseFloat(price) * 100) || 35000;
+    // Generate unique slug
+    const cleanTitle = title.trim().toLowerCase().replace(/[^\w\u0590-\u05ff]+/g, "-");
+    const slug = `${cleanTitle || "artwork"}-${Date.now().toString().slice(-4)}`;
+    const numericPriceAgorot = Math.round(parseFloat(price) * 100) || 45000;
 
+    const materialsArray = materialsInput
+      .split(",")
+      .map((m) => m.trim())
+      .filter(Boolean);
+
+    // Construct full Artwork object matching BUILD-PLAN §4 model
     const newArtwork: Artwork = {
       slug,
       title: { he: title.trim(), en: title.trim() },
       story: { he: story.trim(), en: story.trim() },
       materials: {
-        he: materials.split(",").map((m) => m.trim()),
-        en: materials.split(",").map((m) => m.trim()),
+        he: materialsArray.length > 0 ? materialsArray : ["חומרים מקומיים בעבודת יד"],
+        en: materialsArray.length > 0 ? materialsArray : ["Handmade local materials"],
       },
       discipline,
-      category: { he: category, en: category },
-      inventoryKind: "UNIQUE",
-      availability: "available",
+      category: { he: categoryLabel, en: categoryLabel },
+      inventoryKind,
+      availability,
       dimensions: {
-        heightCm: parseInt(heightCm) || 15,
-        widthCm: parseInt(widthCm) || 20,
-        depthCm: parseInt(depthCm) || 20,
+        heightCm: parseFloat(heightCm) || 15,
+        widthCm: parseFloat(widthCm) || 20,
+        depthCm: parseFloat(depthCm) || 20,
+        weightGrams: parseFloat(weightGrams) || 1000,
       },
       priceAgorot: numericPriceAgorot,
-      shippingSizeBand: "SMALL",
-      isFragile: true,
+      shippingSizeBand: shippingBand,
+      isFragile,
       images: selectedImages.map((img, i) => ({
         publicId: img.url,
         aspectRatio: 4 / 5,
         role: i === 0 ? "primary" : "detail",
-        caption: { he: img.caption, en: img.caption },
+        caption: { he: img.caption || title.trim(), en: img.caption || title.trim() },
       })),
       artist: {
-        slug: user?.email.split("@")[0] || "artist-studio",
+        slug: user?.email ? user.email.split("@")[0] : "boby-artist",
         displayName: { he: artistName.trim(), en: artistName.trim() },
         location: { he: "ישראל", en: "Israel" },
         bio: {
-          he: `אמן/ית יוצר/ת ב-BOBY. שותף/ה בקהילת האמנות הישראלית.`,
-          en: `Israeli artist creating handmade original art pieces.`,
+          he: `${artistName.trim()} — אמן/ית יוצר/ת בגלריית BOBY, יוצר/ת עבודות יד מקוריות בסטודיו.`,
+          en: `${artistName.trim()} — Israeli artist creating original handmade works.`,
         },
         portraitPublicId: null,
       },
     };
 
+    // Client-side persistent store (localStorage)
     addCustomArtwork(newArtwork);
 
-    setTimeout(() => {
-      setIsSubmitting(false);
-      router.push(`/works/${slug}`);
-    }, 400);
+    // Server-side API persistence & inventory registration
+    try {
+      await fetch("/api/artworks/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newArtwork),
+      });
+    } catch (err) {
+      console.warn("Server sync error (client backup active):", err);
+    }
+
+    setIsSubmitting(false);
+
+    // Navigate directly to published artwork page
+    router.push(`/works/${slug}`);
   };
 
   return (
     <div className="mx-auto max-w-3xl rounded-panel border border-border bg-surface p-6 shadow-md md:p-10">
-      <div className="flex items-center justify-between border-b border-border pb-4">
+      {/* Header */}
+      <div className="flex items-center justify-between border-b border-border pb-5 mb-6">
         <div>
-          <span className="rounded-full bg-sand px-3 py-1 text-caption font-semibold text-accent-strong">
-            🎨 אזור אמן — העלאת יצירה
+          <span className="inline-flex items-center rounded-full bg-sand px-3 py-1 text-caption font-semibold text-accent-strong">
+            ✨ אזור אמן — העלאה ופרסום יצירה
           </span>
-          <h1 className="mt-2 text-h1 font-medium text-text md:text-[2.2rem]">
+          <h1 className="mt-2 font-heading text-h1 font-medium text-text md:text-[2.2rem]">
             להעלות יצירה חדשה לגלריה
           </h1>
         </div>
@@ -192,20 +280,22 @@ export function UploadArtworkForm() {
         </button>
       </div>
 
+      {/* Validation Alert */}
       {validationError && (
         <div
           role="alert"
-          className="mt-6 rounded-card border border-error/30 bg-error/10 p-4 text-small text-error font-medium"
+          className="mb-6 rounded-card border border-error/30 bg-error/10 p-4 text-small text-error font-medium"
         >
           ⚠️ {validationError}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-6">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+        {/* Basic Meta (Artist & Title) */}
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
-            <label htmlFor="up-artist-name" className="block mb-1 text-small font-medium text-text">
-              שם האמן / הסטודיו
+            <label htmlFor="up-artist-name" className="block mb-1.5 text-small font-medium text-text">
+              שם האמן / הסטודיו *
             </label>
             <input
               id="up-artist-name"
@@ -218,8 +308,8 @@ export function UploadArtworkForm() {
           </div>
 
           <div>
-            <label htmlFor="up-title" className="block mb-1 text-small font-medium text-text">
-              שם היצירה
+            <label htmlFor="up-title" className="block mb-1.5 text-small font-medium text-text">
+              שם היצירה *
             </label>
             <input
               id="up-title"
@@ -227,16 +317,17 @@ export function UploadArtworkForm() {
               required
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="לדוגמה: קערת קרמיקה פיסולית"
+              placeholder="לדוגמה: קערת קרמיקה פיסולית בחול ומלח ים"
               className="min-h-11 w-full rounded-control border border-border bg-surface px-3.5 text-body focus:border-accent-strong focus:outline-none"
             />
           </div>
         </div>
 
+        {/* Story / Description */}
         <div>
-          <div className="flex items-center justify-between mb-1">
+          <div className="flex items-center justify-between mb-1.5">
             <label htmlFor="up-story" className="text-small font-semibold text-text">
-              סיפור היצירה והתהליך (The Story) *
+              סיפור היצירה ותהליך הסטודיו (The Story) *
             </label>
             <span className="text-caption text-text-muted">יוצג בהבלטה בעמוד המוצר</span>
           </div>
@@ -246,96 +337,126 @@ export function UploadArtworkForm() {
             required
             value={story}
             onChange={(e) => setStory(e.target.value)}
-            placeholder="שתף את הקונים בסיפור מאחורי היצירה: מקור ההשראה, החומרים המקומיים, טכניקת העבודה בסטודיו והמשמעות של החפץ..."
+            placeholder="שתפו את הקונים בסיפור מאחורי היצירה: מקור ההשראה, החומרים המקומיים, טכניקת העבודה בסטודיו והייחוד של החפץ..."
             className="w-full rounded-control border border-border bg-surface p-3.5 text-body placeholder:text-text-muted/60 focus:border-accent-strong focus:outline-none"
           />
         </div>
 
-        <div className="rounded-panel border border-border bg-sand/30 p-4 md:p-5">
+        {/* Real File Upload & Dropzone Area */}
+        <div className="rounded-panel border border-border bg-sand/30 p-5">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
             <div>
               <h3 className="text-small font-semibold text-text">
                 תמונות היצירה (חובה לפחות 2 תמונות) *
               </h3>
               <p className="text-caption text-text-muted">
-                סינון איכות אוטומטי: תאורה טובה, זווית מחמיאה ורקע ניטרלי.
+                העלו תמונות באיכות גבוהה, תאורת סטודיו טובה ורקע ניטרלי.
               </p>
             </div>
-            <span className="rounded-full bg-surface px-2.5 py-1 text-caption font-medium border border-border">
+            <span className="rounded-full bg-surface px-3 py-1 text-caption font-medium border border-border">
               {selectedImages.length} תמונות נבחרו
             </span>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-            {selectedImages.map((img, index) => (
-              <div
-                key={img.id}
-                className={`relative flex flex-col justify-between rounded-card border bg-surface p-2 transition-all ${
-                  img.error ? "border-error bg-error/5" : "border-border hover:border-accent-strong"
-                }`}
-              >
-                <div className="aspect-[4/5] overflow-hidden rounded-artwork bg-stone/30 relative">
-                  <img
-                    src={img.url}
-                    alt={`תצוגה מקדימה ${index + 1}`}
-                    className="h-full w-full object-cover"
-                  />
-                  <span className="absolute start-2 top-2 rounded-full bg-deep/80 px-2 py-0.5 text-caption text-surface">
-                    #{index + 1}
-                  </span>
-                </div>
+          {/* Hidden HTML File Input */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={handleFileChange}
+            className="hidden"
+          />
 
-                {img.error && (
-                  <p className="mt-2 text-caption font-medium text-error leading-snug">
-                    ⚠️ {img.error}
-                  </p>
-                )}
-
-                <div className="mt-2 flex items-center justify-between">
-                  <span className="text-caption text-text-muted truncate max-w-[120px]">
-                    {img.caption}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveImage(img.id)}
-                    className="text-caption font-medium text-error hover:underline"
-                  >
-                    הסר
-                  </button>
-                </div>
-              </div>
-            ))}
+          {/* Drag & Drop File Upload Dropzone */}
+          <div
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            onClick={() => fileInputRef.current?.click()}
+            className={`flex flex-col items-center justify-center rounded-panel border-2 border-dashed p-6 text-center cursor-pointer transition-colors ${
+              isDragOver
+                ? "border-accent-strong bg-sand/80"
+                : "border-stone/40 bg-surface hover:border-accent-strong hover:bg-sand/40"
+            }`}
+          >
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-sand mb-2 text-2xl">
+              📷
+            </div>
+            <p className="text-small font-semibold text-text">
+              לחצו לבחירת תמונות מהמחשב/הטלפון או גררו לכאן קבצים
+            </p>
+            <p className="text-caption text-text-muted mt-1">
+              תומך בפורמטים JPG, PNG, WebP, AVIF
+            </p>
           </div>
 
-          <div className="mt-4 flex flex-wrap gap-2 pt-2 border-t border-border/60">
-            <button
-              type="button"
-              onClick={() => handleAddSampleImage("valid")}
-              className="rounded-control border border-border bg-surface px-3 py-1.5 text-small font-medium text-text hover:bg-sand"
-            >
-              + הוסף תמונה איכותית
-            </button>
+          {/* Uploaded Images Preview Grid */}
+          {selectedImages.length > 0 && (
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 mt-4 pt-4 border-t border-border/60">
+              {selectedImages.map((img, index) => (
+                <div
+                  key={img.id}
+                  className={`relative flex flex-col justify-between rounded-card border bg-surface p-2 transition-all ${
+                    img.error ? "border-error bg-error/5" : "border-border hover:border-accent-strong"
+                  }`}
+                >
+                  <div className="aspect-[4/5] overflow-hidden rounded-artwork bg-stone/30 relative">
+                    <img
+                      src={img.url}
+                      alt={`תצוגה מקדימה ${index + 1}`}
+                      className="h-full w-full object-cover"
+                    />
+                    <span className="absolute start-2 top-2 rounded-full bg-deep/80 px-2 py-0.5 text-caption text-surface font-mono">
+                      #{index + 1}
+                    </span>
+                    {img.isValidated && !img.error && (
+                      <span className="absolute end-2 top-2 rounded-full bg-success text-surface p-1 text-[10px]" title="אושר במבחן איכות">
+                        ✓
+                      </span>
+                    )}
+                  </div>
 
-            <button
-              type="button"
-              onClick={() => handleAddSampleImage("invalid")}
-              className="rounded-control border border-border/80 bg-stone/20 px-3 py-1.5 text-caption font-medium text-text-muted hover:bg-stone/40"
-            >
-              🧪 בדיקת סינון תמונה שאינה עומדת בסטנדרט
-            </button>
-          </div>
+                  {img.error && (
+                    <p className="mt-1.5 text-caption font-medium text-error leading-snug">
+                      ⚠️ {img.error}
+                    </p>
+                  )}
+
+                  <div className="mt-2 space-y-1.5">
+                    <input
+                      type="text"
+                      value={img.caption}
+                      onChange={(e) => handleUpdateCaption(img.id, e.target.value)}
+                      placeholder="תיאור התמונה..."
+                      className="w-full rounded-control border border-border px-2 py-1 text-caption text-text focus:outline-none"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveImage(img.id)}
+                      className="w-full text-caption font-medium text-error hover:underline text-end block"
+                    >
+                      הסר תמונה
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
+        {/* Pricing, Category, & Discipline */}
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <div>
-            <label htmlFor="up-price" className="block mb-1 text-small font-medium text-text">
-              מחיר (₪ כולל מע״מ)
+            <label htmlFor="up-price" className="block mb-1.5 text-small font-medium text-text">
+              מחיר (₪ כולל מע״מ 18%) *
             </label>
             <input
               id="up-price"
               type="number"
               dir="ltr"
               required
+              min="10"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
               className="min-h-11 w-full rounded-control border border-border bg-surface px-3.5 text-body focus:border-accent-strong focus:outline-none"
@@ -343,47 +464,120 @@ export function UploadArtworkForm() {
           </div>
 
           <div>
-            <label htmlFor="up-category" className="block mb-1 text-small font-medium text-text">
-              קטגוריה
+            <label htmlFor="up-category" className="block mb-1.5 text-small font-medium text-text">
+              קטגוריית אמנות *
             </label>
             <select
               id="up-category"
-              value={category}
+              value={categoryLabel}
               onChange={(e) => {
-                setCategory(e.target.value);
-                if (e.target.value === "קרמיקה") setDiscipline("ceramics");
-                if (e.target.value === "הדפס") setDiscipline("painting");
-                if (e.target.value === "עץ") setDiscipline("wood");
+                const val = e.target.value;
+                setCategoryLabel(val);
+                if (val.includes("קרמיקה")) setDiscipline("ceramics");
+                else if (val.includes("תכשיט")) setDiscipline("jewelry");
+                else if (val.includes("הדפס") || val.includes("ציור")) setDiscipline("painting");
+                else if (val.includes("עץ")) setDiscipline("wood");
+                else if (val.includes("טקסטיל")) setDiscipline("textile");
+                else if (val.includes("פיסול")) setDiscipline("sculpture");
+                else if (val.includes("יודאיקה")) setDiscipline("judaica");
               }}
               className="min-h-11 w-full rounded-control border border-border bg-surface px-3.5 text-body focus:border-accent-strong focus:outline-none"
             >
-              <option value="קרמיקה">קרמיקה וקדרות</option>
-              <option value="הדפס">הדפס ואיור</option>
-              <option value="עץ">עיבוד עץ</option>
-              <option value="תכשיט">תכשיט בעבודת יד</option>
+              <option value="קרמיקה וקדרות">קרמיקה וקדרות</option>
+              <option value="הדפס, איור וציור">הדפס, איור וציור</option>
+              <option value="עיבוד עץ וטקסטיל">עיבוד עץ וטקסטיל</option>
+              <option value="צורפות ותכשיטים">צורפות ותכשיטים</option>
+              <option value="פיסול ואבן">פיסול ואבן</option>
+              <option value="יודאיקה עכשווית">יודאיקה עכשווית</option>
             </select>
           </div>
 
           <div>
-            <label htmlFor="up-materials" className="block mb-1 text-small font-medium text-text">
-              חומרים
+            <label htmlFor="up-inventory-kind" className="block mb-1.5 text-small font-medium text-text">
+              סוג מלאי (Inventory Kind) *
+            </label>
+            <select
+              id="up-inventory-kind"
+              value={inventoryKind}
+              onChange={(e) => {
+                const kind = e.target.value as InventoryKind;
+                setInventoryKind(kind);
+                setAvailability("available");
+              }}
+              className="min-h-11 w-full rounded-control border border-border bg-surface px-3.5 text-body focus:border-accent-strong focus:outline-none"
+            >
+              <option value="UNIQUE">UNIQUE (יצירה יחידה מסוגה - qty=1)</option>
+              <option value="LIMITED_EDITION">LIMITED EDITION (מהדורה מוגבלת וממוספרת)</option>
+              <option value="MADE_TO_ORDER">MADE TO ORDER (ייצור בהזמנה אישית)</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Materials & Dimensions */}
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div>
+            <label htmlFor="up-materials" className="block mb-1.5 text-small font-medium text-text">
+              חומרים וטכניקה (מופרדים בפסיקים)
             </label>
             <input
               id="up-materials"
               type="text"
-              value={materials}
-              onChange={(e) => setMaterials(e.target.value)}
-              placeholder="חימר, גלזורה..."
+              value={materialsInput}
+              onChange={(e) => setMaterialsInput(e.target.value)}
+              placeholder="חימר מקומי, גלזורה, עץ אגוז..."
               className="min-h-11 w-full rounded-control border border-border bg-surface px-3.5 text-body focus:border-accent-strong focus:outline-none"
             />
           </div>
+
+          <div className="grid grid-cols-3 gap-2">
+            <div>
+              <label htmlFor="up-h" className="block mb-1 text-caption font-medium text-text">
+                גובה (ס&quot;מ)
+              </label>
+              <input
+                id="up-h"
+                type="number"
+                dir="ltr"
+                value={heightCm}
+                onChange={(e) => setHeightCm(e.target.value)}
+                className="min-h-11 w-full rounded-control border border-border bg-surface px-2.5 text-small focus:outline-none"
+              />
+            </div>
+            <div>
+              <label htmlFor="up-w" className="block mb-1 text-caption font-medium text-text">
+                רוחב (ס&quot;מ)
+              </label>
+              <input
+                id="up-w"
+                type="number"
+                dir="ltr"
+                value={widthCm}
+                onChange={(e) => setWidthCm(e.target.value)}
+                className="min-h-11 w-full rounded-control border border-border bg-surface px-2.5 text-small focus:outline-none"
+              />
+            </div>
+            <div>
+              <label htmlFor="up-d" className="block mb-1 text-caption font-medium text-text">
+                עומק (ס&quot;מ)
+              </label>
+              <input
+                id="up-d"
+                type="number"
+                dir="ltr"
+                value={depthCm}
+                onChange={(e) => setDepthCm(e.target.value)}
+                className="min-h-11 w-full rounded-control border border-border bg-surface px-2.5 text-small focus:outline-none"
+              />
+            </div>
+          </div>
         </div>
 
-        <div className="mt-6 flex items-center justify-end gap-3 border-t border-border pt-4">
+        {/* Submit Actions */}
+        <div className="mt-6 flex items-center justify-end gap-3 border-t border-border pt-5">
           <button
             type="button"
             onClick={() => router.back()}
-            className="rounded-control px-4 py-2.5 text-small font-medium text-text hover:bg-sand"
+            className="rounded-control px-4 py-2.5 text-small font-medium text-text hover:bg-sand transition-colors"
           >
             ביטול
           </button>
@@ -394,7 +588,7 @@ export function UploadArtworkForm() {
             className="rounded-control bg-btn-primary px-6 py-2.5 text-body font-medium text-surface transition-colors hover:bg-deep/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-strong disabled:opacity-50"
           >
             {isValidating
-              ? "🔍 מריץ סינון איכות תמונות..."
+              ? "🔍 מריץ אימות איכות תמונות..."
               : isSubmitting
               ? "מפרסם יצירה..."
               : "אימות תמונות ופרסום היצירה ✨"}
