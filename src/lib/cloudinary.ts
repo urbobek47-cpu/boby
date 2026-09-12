@@ -30,7 +30,7 @@ export function buildCloudinaryUrl(publicId: string, { width, quality }: BuildOp
   // Pass through absolute URLs and local static assets (e.g. /mock/*.jpg used
   // as preview placeholders in development) unchanged. Real photos are
   // Cloudinary public ids and take the transform path below.
-  if (/^(https?:\/\/|\/)/.test(publicId)) return publicId;
+  if (/^(https?:\/\/|\/|data:)/.test(publicId)) return publicId;
 
   const w = Math.min(width, MAX_EDGE);
   const isDetail = (quality ?? 0) >= 80;

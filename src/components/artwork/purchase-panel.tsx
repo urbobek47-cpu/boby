@@ -1,3 +1,5 @@
+"use client";
+
 import { useLocale, useTranslations } from "next-intl";
 import type { Locale } from "@/i18n/routing";
 import { Link } from "@/i18n/navigation";
@@ -7,6 +9,7 @@ import { Price } from "@/components/catalog/price";
 import { AvailabilityBadge } from "@/components/catalog/availability-badge";
 import { Button } from "@/components/ui/button";
 import { LikeButton } from "@/components/ui/like-button";
+import { useCart } from "@/components/cart/cart-context";
 
 /**
  * The purchase panel (design brief screen 3). On desktop it sticks and shows,
@@ -14,13 +17,11 @@ import { LikeButton } from "@/components/ui/like-button";
  * materials, delivery estimate, a returns summary, the primary action, and the
  * honest colour-variance note. Edge states (reserved / sold / made-to-order)
  * change the action block, never hide the information.
- *
- * Phase 1 is read-only — the cart lands in Phase 2, so the primary action is
- * present (design-complete) with an honest "view-only" note beneath it.
  */
 export function PurchasePanel({ artwork }: { artwork: Artwork }) {
   const t = useTranslations("Artwork.panel");
   const locale = useLocale() as Locale;
+  const { addToCart } = useCart();
 
   const dims = formatDimensions(artwork.dimensions, locale);
   const weight = artwork.dimensions.weightGrams
@@ -86,7 +87,12 @@ export function PurchasePanel({ artwork }: { artwork: Artwork }) {
           <span className="text-caption text-text-muted">מחיר כולל מע״מ</span>
           <Price agorot={artwork.priceAgorot} className="text-body font-bold text-text" />
         </div>
-        <Button variant="primary" className="px-5 py-2.5 text-small font-medium shadow-sm">
+        <Button
+          variant="primary"
+          onClick={() => addToCart(artwork)}
+          disabled={artwork.availability === "sold" || artwork.availability === "reserved"}
+          className="px-5 py-2.5 text-small font-medium shadow-sm"
+        >
           {artwork.inventoryKind === "MADE_TO_ORDER" ? "להזמנה לפי מידה" : "הוספה לסל"}
         </Button>
       </div>
@@ -105,6 +111,7 @@ function SpecRow({ term, children }: { term: string; children: React.ReactNode }
 
 function ActionBlock({ artwork }: { artwork: Artwork }) {
   const t = useTranslations("Artwork.panel");
+  const { addToCart } = useCart();
 
   if (artwork.availability === "reserved") {
     return (
@@ -112,7 +119,7 @@ function ActionBlock({ artwork }: { artwork: Artwork }) {
         <p className="font-semibold">{t("reservedTitle")}</p>
         <p className="text-small text-text-muted">{t("reservedBody")}</p>
         <div className="mt-1">
-          <Button variant="secondary">{t("reservedCta")}</Button>
+          <Button variant="secondary" onClick={() => addToCart(artwork)}>{t("reservedCta")}</Button>
         </div>
       </div>
     );
@@ -124,7 +131,7 @@ function ActionBlock({ artwork }: { artwork: Artwork }) {
         <p className="font-semibold">{t("soldTitle")}</p>
         <p className="text-small text-text-muted">{t("soldBody")}</p>
         <div className="mt-1">
-          <Button variant="secondary">{t("soldCta")}</Button>
+          <Button variant="secondary" disabled>{t("soldCta")}</Button>
         </div>
       </div>
     );
@@ -135,10 +142,13 @@ function ActionBlock({ artwork }: { artwork: Artwork }) {
 
   return (
     <div className="flex flex-col gap-2">
-      <Button variant="primary" className="w-full">
+      <Button
+        variant="primary"
+        className="w-full"
+        onClick={() => addToCart(artwork)}
+      >
         {cta}
       </Button>
-      <p className="text-caption text-text-muted">{t("phase1Note")}</p>
     </div>
   );
 }

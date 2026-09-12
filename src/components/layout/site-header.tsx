@@ -1,21 +1,16 @@
+"use client";
+
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { LocaleToggle } from "@/components/layout/locale-toggle";
 import { UserMenu } from "@/components/auth/user-menu";
 import { HeaderSearchBar } from "@/components/layout/header-search-bar";
-
-/**
- * Shared site header. A slim shipping-note bar (~30px), then a three-part row:
- * nav (start) · wordmark (centre) · cart & auth (end). Nav links only to pages that
- * exist. On mobile only "יצירות" + cart show beside the wordmark (which is the
- * home link); secondary links appear from the tablet breakpoint up.
- *
- * The cart pill is a non-functional placeholder in Phase 1 (read-only).
- */
 import { CategoryDrawer } from "@/components/layout/category-drawer";
+import { useCart } from "@/components/cart/cart-context";
 
 export function SiteHeader() {
   const t = useTranslations("Nav");
+  const { itemCount, openCart } = useCart();
 
   return (
     <header className="relative z-40 bg-surface/95 backdrop-blur-md">
@@ -67,9 +62,14 @@ export function SiteHeader() {
             </Link>
             <UserMenu />
             <LocaleToggle />
-            <span className="inline-flex items-center gap-1 rounded-full bg-sand px-2.5 sm:px-3 py-1.5 text-caption sm:text-small font-medium text-text">
-              🛒 <span className="hidden xs:inline">{t("cart")}</span> <span dir="ltr">(0)</span>
-            </span>
+            <button
+              type="button"
+              onClick={openCart}
+              aria-label={`סל הקניות — ${itemCount} פריטים`}
+              className="inline-flex items-center gap-1 rounded-full bg-sand px-2.5 sm:px-3 py-1.5 text-caption sm:text-small font-medium text-text hover:bg-stone/60 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-strong"
+            >
+              🛒 <span className="hidden xs:inline">{t("cart")}</span> <span dir="ltr">({itemCount})</span>
+            </button>
           </div>
         </nav>
       </div>

@@ -61,7 +61,7 @@
   --shadow-soft: 0 1px 3px rgb(17 24 39 / 0.06), 0 8px 24px rgb(17 24 39 / 0.04);
 
   /* ---- layout (§3.4) ---- */
-  --container-content: 1280px; /* content max-width */
+  --container-content: 100%; /* fluid full-width layout for all screen sizes */
   --container-prose: 68ch; /* editorial text max-width */
 
   /* ---- motion (§3.3) ---- */

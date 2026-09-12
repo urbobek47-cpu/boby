@@ -14,7 +14,7 @@ import { defineRouting } from "next-intl/routing";
 export const routing = defineRouting({
   locales: ["he", "en"],
   defaultLocale: "he",
-  localePrefix: "never",
+  localePrefix: "as-needed",
   // Hebrew-first: `/` always serves Hebrew and `/en` is an explicit opt-in.
   // We deliberately do NOT auto-redirect by the browser's Accept-Language —
   // that would send Israeli visitors with an English browser to the checkout-
