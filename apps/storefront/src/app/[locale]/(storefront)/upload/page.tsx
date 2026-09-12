@@ -1,8 +1,8 @@
 import React from "react";
 import type { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
-import { UploadArtworkForm } from "@/components/artwork/upload-artwork-form";
-
+import { hasLocale } from "next-intl";
+import { ArtistLandingView } from "@/components/artist/artist-landing-view";
 import { routing } from "@/i18n/routing";
 
 export function generateStaticParams() {
@@ -10,13 +10,11 @@ export function generateStaticParams() {
 }
 
 export const metadata: Metadata = {
-  title: "העלאת יצירה חדשה לגלריה · BOBY",
-  description: "אזור אמן — העלאת יצירה מקורית וסיפור הסטודיו לגלריית BOBY",
+  title: "אזור אמנים — הצטרפות והעלאת יצירות · BOBY",
+  description: "אזור אמן — גלריית אוצרות מקוונת לאמנות ומלאכת יד ישראלית מקורית",
 };
 
-import { hasLocale } from "next-intl";
-
-export default async function UploadPage({
+export default async function UploadLandingPage({
   params,
 }: {
   params: Promise<{ locale: string }>;
@@ -27,7 +25,7 @@ export default async function UploadPage({
 
   return (
     <main className="mx-auto max-w-[var(--container-content)] px-4 py-8 md:py-16">
-      <UploadArtworkForm />
+      <ArtistLandingView />
     </main>
   );
 }
