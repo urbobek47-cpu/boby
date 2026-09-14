@@ -907,13 +907,18 @@ function getAllArtworks(): Artwork[] {
 }
 
 export async function getArtworkBySlug(slug: string): Promise<Artwork | null> {
+  let decodedSlug = slug;
+  try {
+    decodedSlug = decodeURIComponent(slug);
+  } catch {}
+
   const localList = getAllArtworks();
-  const foundLocal = localList.find((a) => a.slug === slug);
+  const foundLocal = localList.find((a) => a.slug === slug || a.slug === decodedSlug);
   if (foundLocal) {
     return foundLocal;
   }
 
-  const dbArtwork = await getArtworkBySlugDb(slug);
+  const dbArtwork = (await getArtworkBySlugDb(decodedSlug)) || (await getArtworkBySlugDb(slug));
   if (dbArtwork) {
     if (!dynamicArtworksStore.some((a) => a.slug === dbArtwork.slug)) {
       dynamicArtworksStore.unshift(dbArtwork);
@@ -928,7 +933,7 @@ export async function getArtworkBySlug(slug: string): Promise<Artwork | null> {
   }
 
   const cookieList = await getCookieArtworks();
-  const foundCookie = cookieList.find((a) => a.slug === slug);
+  const foundCookie = cookieList.find((a) => a.slug === slug || a.slug === decodedSlug);
   if (foundCookie) {
     if (!dynamicArtworksStore.some((a) => a.slug === foundCookie.slug)) {
       dynamicArtworksStore.unshift(foundCookie);

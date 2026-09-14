@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { useAuth } from "@/components/auth/auth-context";
 import { addCustomArtwork } from "@/lib/catalog/data";
 import { validateArtworkImage } from "@/lib/catalog/image-validation";
@@ -182,8 +182,13 @@ export function UploadArtworkModal({ isOpen, onClose }: UploadArtworkModalProps)
     setTimeout(() => {
       setIsSubmitting(false);
       onClose();
-      // Redirect to newly created product page to showcase images & story immediately
-      router.push(`/works/${slug}`);
+      // Redirect to newly created product page staying on current domain origin
+      const encodedSlug = encodeURIComponent(slug);
+      if (typeof window !== "undefined") {
+        window.location.href = `${window.location.origin}/he/works/${encodedSlug}`;
+      } else {
+        router.push(`/works/${encodedSlug}`);
+      }
     }, 400);
   };
 

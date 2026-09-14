@@ -32,8 +32,9 @@ export async function generateMetadata({
 }: {
   params: Promise<Params>;
 }): Promise<Metadata> {
-  const { locale: rawLocale, slug } = await params;
+  const { locale: rawLocale, slug: rawSlug } = await params;
   const locale = hasLocale(routing.locales, rawLocale) ? (rawLocale as Locale) : routing.defaultLocale;
+  const slug = decodeURIComponent(rawSlug);
   const artwork = await getArtworkBySlug(slug);
   if (!artwork) return {};
   const l = locale as Locale;
@@ -58,9 +59,10 @@ export default async function ArtworkPage({
 }: {
   params: Promise<Params>;
 }) {
-  const { locale: rawLocale, slug } = await params;
+  const { locale: rawLocale, slug: rawSlug } = await params;
   const locale = hasLocale(routing.locales, rawLocale) ? (rawLocale as Locale) : routing.defaultLocale;
   setRequestLocale(locale);
+  const slug = decodeURIComponent(rawSlug);
   const artwork = await getArtworkBySlug(slug);
   if (!artwork) notFound();
 
