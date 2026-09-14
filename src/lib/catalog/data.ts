@@ -872,6 +872,21 @@ export function addCustomArtwork(newArtwork: Artwork): void {
   });
 }
 
+async function getCookieArtworks(): Promise<Artwork[]> {
+  try {
+    const { cookies } = await import("next/headers");
+    const cookieStore = await cookies();
+    const raw = cookieStore.get("boby_custom_artworks")?.value;
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) return parsed;
+    }
+  } catch {
+    // Ignore when executed outside request context
+  }
+  return [];
+}
+
 function getAllArtworks(): Artwork[] {
   let custom: Artwork[] = [];
   try {
@@ -912,14 +927,30 @@ export async function getArtworkBySlug(slug: string): Promise<Artwork | null> {
     return dbArtwork;
   }
 
+  const cookieList = await getCookieArtworks();
+  const foundCookie = cookieList.find((a) => a.slug === slug);
+  if (foundCookie) {
+    if (!dynamicArtworksStore.some((a) => a.slug === foundCookie.slug)) {
+      dynamicArtworksStore.unshift(foundCookie);
+    }
+    const { registerArtworkInventory } = await import("../orders/reservation-engine");
+    registerArtworkInventory(
+      foundCookie.slug,
+      foundCookie.inventoryKind,
+      foundCookie.inventoryKind === "UNIQUE" ? 1 : 10
+    );
+    return foundCookie;
+  }
+
   return null;
 }
 
 export async function listArtworks(): Promise<Artwork[]> {
   const localList = getAllArtworks();
   const dbList = await listArtworksDb();
+  const cookieList = await getCookieArtworks();
 
-  const combined = [...localList, ...dbList];
+  const combined = [...localList, ...dbList, ...cookieList];
   const uniqueMap = new Map<string, Artwork>();
   const { registerArtworkInventory } = await import("../orders/reservation-engine");
   for (const item of combined) {
@@ -954,5 +985,6 @@ export async function listArtworksByArtist(slug: string): Promise<Artwork[]> {
   const all = await listArtworks();
   return all.filter((a) => a.artist.slug === slug);
 }
+
 
 
