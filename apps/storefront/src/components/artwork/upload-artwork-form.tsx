@@ -67,7 +67,44 @@ export function UploadArtworkForm() {
     e.target.value = "";
   };
 
-  // Process uploaded image files into Data URLs
+  // Compress local image file using createImageBitmap and Canvas to max 2400px WebP (<1MB)
+  const getCompressedBlob = async (file: File): Promise<Blob> => {
+    if (file.size <= 1024 * 1024) return file;
+    try {
+      const bitmap = await createImageBitmap(file);
+      const MAX_DIM = 2400;
+      let width = bitmap.width;
+      let height = bitmap.height;
+      if (width > MAX_DIM || height > MAX_DIM) {
+        if (width > height) {
+          height = Math.round((height * MAX_DIM) / width);
+          width = MAX_DIM;
+        } else {
+          width = Math.round((width * MAX_DIM) / height);
+          height = MAX_DIM;
+        }
+      }
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) {
+        bitmap.close();
+        return file;
+      }
+      ctx.drawImage(bitmap, 0, 0, width, height);
+      bitmap.close();
+      const blob = await new Promise<Blob | null>((resolve) =>
+        canvas.toBlob(resolve, "image/webp", 0.85)
+      );
+      return blob || file;
+    } catch (err) {
+      console.warn("[Image Compression Warning]", err);
+      return file;
+    }
+  };
+
+  // Process uploaded image files into Data URLs & preserve File objects
   const processFiles = (files: File[]) => {
     setValidationError(null);
     const validImageFiles = files.filter((f) => f.type.startsWith("image/"));
@@ -87,7 +124,7 @@ export function UploadArtworkForm() {
             {
               id: `img-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
               url: dataUrl,
-              file,
+              file: file,
               caption: file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " "),
             },
           ]);
@@ -133,6 +170,12 @@ export function UploadArtworkForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setValidationError(null);
+
+    // Verify user authentication (FIX 1)
+    if (!user || !user.email) {
+      setValidationError("יש להתחבר לחשבון אמן רשום כדי להעלות יצירות לגלריה.");
+      return;
+    }
 
     if (selectedImages.length < 2) {
       setValidationError("חובה להעלות לפחות 2 תמונות איכותיות של היצירה.");
@@ -189,6 +232,63 @@ export function UploadArtworkForm() {
 
     setIsSubmitting(true);
 
+    // Upload local images to image storage server via FormData (FIX 2)
+    const processedImages: Array<{
+      publicId: string;
+      aspectRatio: number;
+      role: "primary" | "detail";
+      caption: { he: string; en: string };
+    }> = [];
+
+    for (let i = 0; i < selectedImages.length; i++) {
+      const img = selectedImages[i];
+      let finalPublicId = img.url;
+
+      if (img.file || img.url.startsWith("data:") || img.url.startsWith("blob:")) {
+        try {
+          const formData = new FormData();
+          if (img.file) {
+            const compressedBlob = await getCompressedBlob(img.file);
+            formData.append("file", compressedBlob, img.file.name || `artwork-${i}.webp`);
+          } else {
+            const blobRes = await fetch(img.url);
+            const rawBlob = await blobRes.blob();
+            formData.append("file", rawBlob, `artwork-${i}.png`);
+          }
+
+          const uploadRes = await fetch("/api/artworks/upload", {
+            method: "POST",
+            body: formData,
+          });
+
+          const uploadData = await uploadRes.json();
+          if (!uploadRes.ok || !uploadData.success || !uploadData.publicId) {
+            throw new Error(uploadData.reason || "נכשלה העלאת התמונה לשרת האחסון");
+          }
+
+          finalPublicId = uploadData.publicId;
+        } catch (uploadErr: unknown) {
+          const errMsg = uploadErr instanceof Error ? uploadErr.message : "נכשלה העלאת הקובץ";
+          setValidationError(`שגיאה בהעלאת תמונה #${i + 1}: ${errMsg}`);
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
+      if (finalPublicId.startsWith("data:") || finalPublicId.startsWith("blob:")) {
+        setValidationError(`שגיאה: התמונה #${i + 1} לא הועלתה לשרת האחסון בהצלחה.`);
+        setIsSubmitting(false);
+        return;
+      }
+
+      processedImages.push({
+        publicId: finalPublicId,
+        aspectRatio: 4 / 5,
+        role: i === 0 ? "primary" : "detail",
+        caption: { he: img.caption || title.trim(), en: img.caption || title.trim() },
+      });
+    }
+
     // Generate unique slug
     const cleanTitle = title.trim().toLowerCase().replace(/[^\w\u0590-\u05ff]+/g, "-");
     const slug = `${cleanTitle || "artwork"}-${Date.now().toString().slice(-4)}`;
@@ -198,6 +298,9 @@ export function UploadArtworkForm() {
       .split(",")
       .map((m) => m.trim())
       .filter(Boolean);
+
+    const userEmailClean = user.email.trim().toLowerCase();
+    const userSlugPrefix = userEmailClean.split("@")[0];
 
     // Construct full Artwork object matching BUILD-PLAN §4 model
     const newArtwork: Artwork = {
@@ -221,41 +324,48 @@ export function UploadArtworkForm() {
       priceAgorot: numericPriceAgorot,
       shippingSizeBand: shippingBand,
       isFragile,
-      images: selectedImages.map((img, i) => ({
-        publicId: img.url,
-        aspectRatio: 4 / 5,
-        role: i === 0 ? "primary" : "detail",
-        caption: { he: img.caption || title.trim(), en: img.caption || title.trim() },
-      })),
+      images: processedImages,
       artist: {
-        slug: user?.email ? user.email.split("@")[0] : "boby-artist",
-        displayName: { he: artistName.trim(), en: artistName.trim() },
+        slug: userSlugPrefix,
+        displayName: { he: artistName.trim() || user.name, en: artistName.trim() || user.name },
         location: { he: "ישראל", en: "Israel" },
         bio: {
           he: `${artistName.trim()} — אמן/ית יוצר/ת בגלריית BOBY, יוצר/ת עבודות יד מקוריות בסטודיו.`,
           en: `${artistName.trim()} — Israeli artist creating original handmade works.`,
         },
-        portraitPublicId: null,
+        portraitPublicId: user.avatarUrl || null,
       },
     };
 
     // Client-side persistent store (localStorage)
     addCustomArtwork(newArtwork);
 
-    // Server-side API persistence & inventory registration
+    // Server-side API persistence & inventory registration (FIX 3)
+    let createRes: Response;
+    let createData: { success?: boolean; reason?: string } = {};
     try {
-      await fetch("/api/artworks/create", {
+      createRes = await fetch("/api/artworks/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newArtwork),
       });
-    } catch (err) {
-      console.warn("Server sync error (client backup active):", err);
+      createData = await createRes.json().catch(() => ({ success: false, reason: "תשובת שרת לא תקינה" }));
+    } catch (err: unknown) {
+      const errMsg = err instanceof Error ? err.message : "נכשלה התקשורת עם השרת";
+      setValidationError(`אירעה שגיאת תקשורת בפרסום היצירה: ${errMsg}`);
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (!createRes.ok || !createData.success) {
+      setValidationError(createData.reason || `שגיאה בפרסום היצירה בשרת (${createRes.status})`);
+      setIsSubmitting(false);
+      return;
     }
 
     setIsSubmitting(false);
 
-    // Navigate directly to published artwork page staying on current domain origin
+    // Navigate directly to published artwork page after confirmed success
     const encodedSlug = encodeURIComponent(slug);
     if (typeof window !== "undefined") {
       window.location.href = `${window.location.origin}/he/works/${encodedSlug}`;
