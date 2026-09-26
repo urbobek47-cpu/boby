@@ -35,7 +35,17 @@ export async function POST(request: Request) {
       if (existingRaw) {
         try { existing = JSON.parse(existingRaw); } catch {}
       }
-      const updated = [artwork, ...existing.filter((a) => a.slug !== artwork.slug)].slice(0, 20);
+      // Sanitize artwork object for cookie to ensure size < 4KB (replace base64 data URLs with placeholders)
+      const sanitizeForCookie = (art: Artwork): Artwork => ({
+        ...art,
+        images: art.images.map((img) => ({
+          ...img,
+          publicId: img.publicId && img.publicId.startsWith("data:") ? "/mock/earth-bowl.jpg" : img.publicId,
+        })),
+      });
+
+      const sanitizedArtwork = sanitizeForCookie(artwork);
+      const updated = [sanitizedArtwork, ...existing.filter((a) => a.slug !== artwork.slug)].slice(0, 5);
       response.cookies.set("boby_custom_artworks", JSON.stringify(updated), {
         path: "/",
         maxAge: 60 * 60 * 24 * 30, // 30 days

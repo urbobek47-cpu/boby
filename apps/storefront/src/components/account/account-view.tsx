@@ -2,14 +2,17 @@
 
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/components/auth/auth-context";
-import { Link } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
 import { getLikedSlugs } from "@/components/ui/like-button";
-import { listArtworks } from "@/lib/catalog/data";
+import { listArtworks, removeCustomArtwork, updateCustomArtwork } from "@/lib/catalog/data";
 import type { Artwork } from "@/lib/catalog/types";
 import { ArtworkCard } from "@/components/catalog/artwork-card";
+import { EditArtworkModal } from "@/components/artwork/edit-artwork-modal";
+import { buildCloudinaryUrl } from "@/lib/cloudinary";
 
 export function AccountView() {
   const { user, openAuthModal, login, logout } = useAuth();
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<"profile" | "saved" | "artworks">("profile");
 
   // Profile Edit Form State
@@ -21,7 +24,13 @@ export function AccountView() {
 
   // Saved / Liked Artworks State
   const [likedArtworks, setLikedArtworks] = useState<Artwork[]>([]);
-  const [customArtworks, setCustomArtworks] = useState<Artwork[]>([]);
+  
+  // Artist Owned Artworks State
+  const [myArtworks, setMyArtworks] = useState<Artwork[]>([]);
+  const [editingArtwork, setEditingArtwork] = useState<Artwork | null>(null);
+  const [deletingSlug, setDeletingSlug] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [actionSuccess, setActionSuccess] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -32,19 +41,28 @@ export function AccountView() {
     }
   }, [user]);
 
-  useEffect(() => {
-    async function loadData() {
-      const all = await listArtworks();
-      const likedSlugs = getLikedSlugs();
-      setLikedArtworks(all.filter((a) => likedSlugs.includes(a.slug)));
+  const loadData = async () => {
+    if (!user) return;
+    const all = await listArtworks();
 
-      try {
-        const storedCustom: Artwork[] = JSON.parse(localStorage.getItem("boby_custom_artworks") || "[]");
-        setCustomArtworks(storedCustom);
-      } catch {
-        setCustomArtworks([]);
-      }
-    }
+    // 1. Liked artworks
+    const likedSlugs = getLikedSlugs();
+    setLikedArtworks(all.filter((a) => likedSlugs.includes(a.slug)));
+
+    // 2. User owned artworks (Strict ownership filter: artist.slug matching user email or email prefix)
+    const userEmailClean = user.email.toLowerCase();
+    const userPrefix = user.email.split("@")[0].toLowerCase();
+
+    const owned = all.filter((art) => {
+      const artArtistSlug = (art.artist?.slug || "").toLowerCase();
+      // Only include user-created custom artworks matching logged-in user identifier
+      return artArtistSlug === userEmailClean || artArtistSlug === userPrefix;
+    });
+
+    setMyArtworks(owned);
+  };
+
+  useEffect(() => {
     loadData();
   }, [user]);
 
@@ -91,6 +109,99 @@ export function AccountView() {
     });
     setIsSaved(true);
     setTimeout(() => setIsSaved(false), 3000);
+  };
+
+  // Delete Artwork Handler
+  const handleDeleteArtwork = async (slug: string) => {
+    setActionError(null);
+    setActionSuccess(null);
+
+    let decodedSlug = slug;
+    try { decodedSlug = decodeURIComponent(slug); } catch {}
+
+    const target = myArtworks.find(
+      (a) => a.slug === slug || a.slug === decodedSlug || decodeURIComponent(a.slug) === decodedSlug
+    );
+    const titleText = target?.title?.he || target?.title?.en || slug;
+
+    const confirmed = window.confirm(`האם למחוק לצמיתות את היצירה "${titleText}"? הפעולה אינה ניתנת לבטול.`);
+    if (!confirmed) return;
+
+    setDeletingSlug(slug);
+
+    try {
+      const res = await fetch("/api/artworks/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug, userEmail: user.email }),
+      });
+
+      const data = await res.json();
+
+      if (res.status === 403) {
+        throw new Error(data.reason || "אינך מורשה למחוק יצירה זו");
+      }
+
+      const isSuccessfulDelete = res.ok || data.success || data.alreadyDeleted || res.status === 404;
+
+      if (!isSuccessfulDelete) {
+        throw new Error(data.reason || "נכשלה מחיקת היצירה");
+      }
+
+      // Immediately remove item from client state using URL-decoded robust matching
+      setMyArtworks((prev) =>
+        prev.filter((a) => {
+          let aDecoded = a.slug;
+          try { aDecoded = decodeURIComponent(a.slug); } catch {}
+          return (
+            a.slug !== slug &&
+            a.slug !== decodedSlug &&
+            aDecoded !== slug &&
+            aDecoded !== decodedSlug
+          );
+        })
+      );
+
+      // Purge from client memory and localStorage
+      removeCustomArtwork(slug);
+      removeCustomArtwork(decodedSlug);
+
+      // Refresh router cache
+      router.refresh();
+
+      setActionSuccess(`היצירה "${titleText}" נמחקה בהצלחה מהמערכת.`);
+      setTimeout(() => setActionSuccess(null), 4000);
+    } catch (err: any) {
+      setActionError(err?.message || "אירעה שגיאה בביצוע המחיקה");
+    } finally {
+      setDeletingSlug(null);
+    }
+  };
+
+
+  // Save Edit Handler
+  const handleSaveEdit = async (updated: Artwork) => {
+    setActionError(null);
+    setActionSuccess(null);
+
+    const res = await fetch("/api/artworks/update", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ artwork: updated, userEmail: user.email }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok || !data.success) {
+      throw new Error(data.reason || "נכשל עדכון היצירה");
+    }
+
+    // Update state & store
+    setMyArtworks((prev) => prev.map((a) => (a.slug === updated.slug ? updated : a)));
+    updateCustomArtwork(updated);
+
+    setActionSuccess(`היצירה "${updated.title?.he || updated.slug}" עודכנה בהצלחה!`);
+    setTimeout(() => setActionSuccess(null), 4000);
   };
 
   return (
@@ -144,6 +255,19 @@ export function AccountView() {
         </div>
       </div>
 
+      {/* Action Messages */}
+      {actionSuccess && (
+        <div role="status" className="rounded-card bg-success/10 border border-success/30 p-4 text-small text-success font-medium">
+          ✓ {actionSuccess}
+        </div>
+      )}
+
+      {actionError && (
+        <div role="alert" className="rounded-card bg-error/10 border border-error/30 p-4 text-small text-error font-medium">
+          ⚠️ {actionError}
+        </div>
+      )}
+
       {/* Tabs Switcher */}
       <div className="flex border-b border-border gap-2">
         <button
@@ -180,7 +304,7 @@ export function AccountView() {
                 : "border-transparent text-text-muted hover:text-text"
             }`}
           >
-            🎨 היצירות שלי בגלריה ({customArtworks.length})
+            🎨 היצירות שלי בגלריה ({myArtworks.length})
           </button>
         )}
       </div>
@@ -315,13 +439,16 @@ export function AccountView() {
         </div>
       )}
 
-      {/* TAB 3: Artist Uploaded Artworks */}
+      {/* TAB 3: Artist Uploaded Artworks Management */}
       {isArtist && activeTab === "artworks" && (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-6">
           <div className="flex items-center justify-between">
-            <p className="text-small font-medium text-text-muted">
-              יצירות שהעלת לגלריה בשימוש אחסון מקומי
-            </p>
+            <div>
+              <h2 className="text-h3 font-medium text-text">היצירות שלי בגלריה</h2>
+              <p className="text-caption text-text-muted">
+                ניהול היצירות המקוריות שהעלית: צפייה, עריכת פרטים ומחיקה מורשית.
+              </p>
+            </div>
             <Link
               href="/upload/new"
               className="rounded-control bg-accent px-4 py-2 text-small font-medium text-surface hover:bg-accent-strong transition-colors"
@@ -330,11 +457,89 @@ export function AccountView() {
             </Link>
           </div>
 
-          {customArtworks.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              {customArtworks.map((art) => (
-                <ArtworkCard key={art.slug} artwork={art} />
-              ))}
+          {myArtworks.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {myArtworks.map((art) => {
+                const titleText = art.title?.he || art.title?.en || "יצירה";
+                const priceFormatted = `₪${((art.priceAgorot || 45000) / 100).toLocaleString()}`;
+                const primaryImg = art.images?.[0]?.publicId || "/mock/earth-bowl.jpg";
+                const imgUrl = primaryImg.startsWith("/")
+                  ? primaryImg
+                  : buildCloudinaryUrl(primaryImg, { width: 400, quality: 80 });
+
+                const availabilityLabel =
+                  art.availability === "sold"
+                    ? "נמכר (Sold Out)"
+                    : art.availability === "reserved"
+                    ? "נשמר (Reserved)"
+                    : "זמין למכירה (Available)";
+
+                const badgeBg =
+                  art.availability === "sold"
+                    ? "bg-stone/60 text-text-muted"
+                    : art.availability === "reserved"
+                    ? "bg-sand text-accent-strong"
+                    : "bg-success/15 text-success font-medium";
+
+                return (
+                  <div
+                    key={art.slug}
+                    className="flex gap-4 rounded-panel border border-border bg-surface p-4 shadow-sm hover:shadow-md transition-shadow"
+                  >
+                    <div className="h-28 w-24 shrink-0 overflow-hidden rounded-artwork bg-sand/40">
+                      <img
+                        src={imgUrl}
+                        alt={titleText}
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
+
+                    <div className="flex flex-1 flex-col justify-between min-w-0">
+                      <div>
+                        <div className="flex items-center justify-between gap-2">
+                          <h3 className="font-heading text-body font-medium text-text truncate">
+                            <Link href={`/works/${art.slug}`} className="hover:underline">
+                              {titleText}
+                            </Link>
+                          </h3>
+                          <span className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] ${badgeBg}`}>
+                            {availabilityLabel}
+                          </span>
+                        </div>
+                        <p className="text-small font-semibold text-accent-strong mt-0.5" dir="ltr">
+                          {priceFormatted}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-2 mt-3 pt-2 border-t border-border/50">
+                        <Link
+                          href={`/works/${art.slug}`}
+                          className="text-caption font-medium text-text-muted hover:text-text transition-colors"
+                        >
+                          👁️ צפייה בגלריה
+                        </Link>
+
+                        <button
+                          type="button"
+                          onClick={() => setEditingArtwork(art)}
+                          className="rounded-control bg-sand/60 px-3 py-1 text-caption font-medium text-text hover:bg-stone/60 transition-colors"
+                        >
+                          ✏️ עריכה
+                        </button>
+
+                        <button
+                          type="button"
+                          disabled={deletingSlug === art.slug}
+                          onClick={() => handleDeleteArtwork(art.slug)}
+                          className="rounded-control bg-error/10 px-3 py-1 text-caption font-medium text-error hover:bg-error/20 transition-colors disabled:opacity-50"
+                        >
+                          {deletingSlug === art.slug ? "מוחק..." : "🗑️ מחיקה"}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           ) : (
             <div className="rounded-panel border border-border bg-sand/30 p-8 text-center">
@@ -352,6 +557,16 @@ export function AccountView() {
           )}
         </div>
       )}
+
+      {/* Edit Artwork Modal */}
+      <EditArtworkModal
+        artwork={editingArtwork}
+        isOpen={Boolean(editingArtwork)}
+        onClose={() => setEditingArtwork(null)}
+        onSave={handleSaveEdit}
+        userEmail={user.email}
+      />
     </div>
   );
 }
+

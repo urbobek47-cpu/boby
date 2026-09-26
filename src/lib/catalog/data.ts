@@ -849,6 +849,7 @@ const artworks: Artwork[] = [
 export { artworks };
 
 import { insertArtworkDb, getArtworkBySlugDb, listArtworksDb } from "../supabase";
+import { getCustomArtworksServer, saveCustomArtworkServer, removeCustomArtworkServer } from "./custom-artworks-store";
 
 const dynamicArtworksStore: Artwork[] = [];
 
@@ -856,6 +857,8 @@ export function addCustomArtwork(newArtwork: Artwork): void {
   if (!dynamicArtworksStore.some((a) => a.slug === newArtwork.slug)) {
     dynamicArtworksStore.unshift(newArtwork);
   }
+  saveCustomArtworkServer(newArtwork);
+
   try {
     if (typeof window !== "undefined") {
       const existing: Artwork[] = JSON.parse(localStorage.getItem("boby_custom_artworks") || "[]");
@@ -871,6 +874,50 @@ export function addCustomArtwork(newArtwork: Artwork): void {
     console.error("[Supabase Error] Failed async insertArtworkDb:", err);
   });
 }
+
+export function removeCustomArtwork(slug: string): void {
+  let decoded = slug;
+  try { decoded = decodeURIComponent(slug); } catch {}
+
+  for (let i = dynamicArtworksStore.length - 1; i >= 0; i--) {
+    if (dynamicArtworksStore[i].slug === slug || dynamicArtworksStore[i].slug === decoded) {
+      dynamicArtworksStore.splice(i, 1);
+    }
+  }
+
+  removeCustomArtworkServer(slug);
+
+  try {
+    if (typeof window !== "undefined") {
+      const existing: Artwork[] = JSON.parse(localStorage.getItem("boby_custom_artworks") || "[]");
+      const filtered = existing.filter((a) => a.slug !== slug && a.slug !== decoded);
+      localStorage.setItem("boby_custom_artworks", JSON.stringify(filtered));
+    }
+  } catch {
+    // Ignore storage error
+  }
+}
+
+
+export function updateCustomArtwork(updatedArtwork: Artwork): void {
+  const index = dynamicArtworksStore.findIndex((a) => a.slug === updatedArtwork.slug);
+  if (index !== -1) {
+    dynamicArtworksStore[index] = updatedArtwork;
+  } else {
+    dynamicArtworksStore.unshift(updatedArtwork);
+  }
+  saveCustomArtworkServer(updatedArtwork);
+  try {
+    if (typeof window !== "undefined") {
+      const existing: Artwork[] = JSON.parse(localStorage.getItem("boby_custom_artworks") || "[]");
+      const filtered = existing.filter((a) => a.slug !== updatedArtwork.slug);
+      localStorage.setItem("boby_custom_artworks", JSON.stringify([updatedArtwork, ...filtered]));
+    }
+  } catch {
+    // Ignore storage error
+  }
+}
+
 
 async function getCookieArtworks(): Promise<Artwork[]> {
   try {
@@ -896,7 +943,8 @@ function getAllArtworks(): Artwork[] {
   } catch {
     custom = [];
   }
-  const combined = [...dynamicArtworksStore, ...custom, ...artworks];
+  const serverCustom = getCustomArtworksServer();
+  const combined = [...dynamicArtworksStore, ...serverCustom, ...custom, ...artworks];
   const uniqueMap = new Map<string, Artwork>();
   for (const item of combined) {
     if (!uniqueMap.has(item.slug)) {
@@ -912,12 +960,13 @@ export async function getArtworkBySlug(slug: string): Promise<Artwork | null> {
     decodedSlug = decodeURIComponent(slug);
   } catch {}
 
-  const localList = getAllArtworks();
-  const foundLocal = localList.find((a) => a.slug === slug || a.slug === decodedSlug);
-  if (foundLocal) {
-    return foundLocal;
+  // 1. Static built-in mock/demo artworks (Always preserved)
+  const staticFound = artworks.find((a) => a.slug === slug || a.slug === decodedSlug);
+  if (staticFound) {
+    return staticFound;
   }
 
+  // 2. Primary Source of Truth: Supabase PostgreSQL Database
   const dbArtwork = (await getArtworkBySlugDb(decodedSlug)) || (await getArtworkBySlugDb(slug));
   if (dbArtwork) {
     if (!dynamicArtworksStore.some((a) => a.slug === dbArtwork.slug)) {
@@ -932,30 +981,59 @@ export async function getArtworkBySlug(slug: string): Promise<Artwork | null> {
     return dbArtwork;
   }
 
-  const cookieList = await getCookieArtworks();
-  const foundCookie = cookieList.find((a) => a.slug === slug || a.slug === decodedSlug);
-  if (foundCookie) {
-    if (!dynamicArtworksStore.some((a) => a.slug === foundCookie.slug)) {
-      dynamicArtworksStore.unshift(foundCookie);
-    }
-    const { registerArtworkInventory } = await import("../orders/reservation-engine");
-    registerArtworkInventory(
-      foundCookie.slug,
-      foundCookie.inventoryKind,
-      foundCookie.inventoryKind === "UNIQUE" ? 1 : 10
-    );
-    return foundCookie;
+  // 3. If server environment with active Supabase returned null, custom artwork was deleted!
+  if (typeof window === "undefined" && process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    removeCustomArtwork(slug);
+    removeCustomArtwork(decodedSlug);
+    return null;
+  }
+
+  // 4. Secondary fallback for browser client local custom artworks
+  const localList = getAllArtworks();
+  const foundLocal = localList.find((a) => a.slug === slug || a.slug === decodedSlug);
+  if (foundLocal) {
+    return foundLocal;
   }
 
   return null;
 }
 
 export async function listArtworks(): Promise<Artwork[]> {
-  const localList = getAllArtworks();
   const dbList = await listArtworksDb();
+  const localList = getAllArtworks();
   const cookieList = await getCookieArtworks();
 
-  const combined = [...localList, ...dbList, ...cookieList];
+  // Purge local custom artworks if dbList was successfully fetched from Supabase
+  if (dbList.length > 0) {
+    const dbSlugSet = new Set(dbList.map((a) => a.slug));
+    const validLocalList = localList.filter((item) => {
+      const isStatic = artworks.some((a) => a.slug === item.slug);
+      if (isStatic) return true;
+      const existsInDb = dbSlugSet.has(item.slug);
+      if (!existsInDb) {
+        removeCustomArtwork(item.slug);
+      }
+      return existsInDb;
+    });
+
+    const combined = [...artworks, ...dbList, ...validLocalList, ...cookieList];
+    const uniqueMap = new Map<string, Artwork>();
+    const { registerArtworkInventory } = await import("../orders/reservation-engine");
+    for (const item of combined) {
+      if (!uniqueMap.has(item.slug)) {
+        uniqueMap.set(item.slug, item);
+        registerArtworkInventory(
+          item.slug,
+          item.inventoryKind,
+          item.inventoryKind === "UNIQUE" ? 1 : 10
+        );
+      }
+    }
+    return Array.from(uniqueMap.values());
+  }
+
+  // Client-side fallback where dbList is empty due to client execution
+  const combined = [...artworks, ...localList, ...cookieList];
   const uniqueMap = new Map<string, Artwork>();
   const { registerArtworkInventory } = await import("../orders/reservation-engine");
   for (const item of combined) {
