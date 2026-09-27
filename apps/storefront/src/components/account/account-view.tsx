@@ -21,6 +21,7 @@ export function AccountView() {
   const [phone, setPhone] = useState(user?.phone || "");
   const [studioName, setStudioName] = useState(user?.studioName || "");
   const [discipline, setDiscipline] = useState(user?.discipline || "קרמיקה");
+  const [avatarUrl, setAvatarUrl] = useState(user?.avatarUrl || "");
   const [isSaved, setIsSaved] = useState(false);
 
   // Saved / Liked Artworks State
@@ -39,8 +40,23 @@ export function AccountView() {
       setPhone(user.phone || "");
       setStudioName(user.studioName || "");
       setDiscipline(user.discipline || "קרמיקה");
+      setAvatarUrl(user.avatarUrl || "");
     }
   }, [user]);
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setActionError("נא לבחור קובץ תמונה תקין (JPG, PNG, WebP)");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setAvatarUrl(event.target?.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
 
   const loadData = async () => {
     if (!user) return;
@@ -119,6 +135,7 @@ export function AccountView() {
       phone: formattedPhone || undefined,
       studioName: isArtist ? studioName.trim() : undefined,
       discipline: isArtist ? discipline : undefined,
+      avatarUrl: avatarUrl || undefined,
     });
     setIsSaved(true);
     setTimeout(() => setIsSaved(false), 3000);
@@ -413,6 +430,33 @@ export function AccountView() {
                     <option value="צורפות ותכשיטים">צורפות ותכשיטים</option>
                     <option value="זכוכית ומתכת">זכוכית ומתכת</option>
                   </select>
+                </div>
+
+                <div className="sm:col-span-2">
+                  <label htmlFor="acc-avatar" className="block mb-1 text-small font-medium text-text">
+                    תמונת פרופיל
+                  </label>
+                  <div className="flex items-center gap-3">
+                    <div className="h-14 w-14 shrink-0 overflow-hidden rounded-full border border-border bg-sand/60 flex items-center justify-center text-text-muted">
+                      {avatarUrl ? (
+                        <img src={avatarUrl} alt="תמונת פרופיל" className="h-full w-full object-cover" />
+                      ) : (
+                        <span className="text-xl">🎨</span>
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <input
+                        id="acc-avatar"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleAvatarChange}
+                        className="w-full text-caption text-text-muted file:me-3 file:rounded-control file:border-0 file:bg-sand/80 file:px-3 file:py-1.5 file:text-caption file:font-medium file:text-text hover:file:bg-sand cursor-pointer"
+                      />
+                      <p className="mt-1 text-caption text-text-muted">
+                        תמונה עוזרת ללקוחות להתחבר לאמן שמאחורי היצירה.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </>
             )}

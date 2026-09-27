@@ -23,6 +23,7 @@ export function AuthModal() {
   const [phone, setPhone] = useState("");
   const [studioName, setStudioName] = useState("");
   const [discipline, setDiscipline] = useState("קרמיקה");
+  const [avatarUrl, setAvatarUrl] = useState<string | undefined>(undefined);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -40,8 +41,23 @@ export function AuthModal() {
       setFullName("");
       setPhone("");
       setStudioName("");
+      setAvatarUrl(undefined);
     }
   }, [isAuthModalOpen, activeRole, activeMode]);
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setError("נא לבחור קובץ תמונה תקין (JPG, PNG, WebP)");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setAvatarUrl(event.target?.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
 
   // Handle ESC key press
   useEffect(() => {
@@ -103,6 +119,7 @@ export function AuthModal() {
         phone: phone.trim() ? normalizeIsraeliPhone(phone.trim()) : undefined,
         studioName: role === "artist" ? studioName || userName : undefined,
         discipline: role === "artist" ? discipline : undefined,
+        avatarUrl: role === "artist" ? avatarUrl : undefined,
       });
 
       setSuccessMessage(
@@ -384,6 +401,39 @@ export function AuthModal() {
                     placeholder="050-1234567"
                     className="min-h-11 w-full rounded-control border border-border bg-surface px-3.5 text-body placeholder:text-text-muted/60 focus:border-accent-strong focus:outline-none focus:ring-1 focus:ring-accent-strong"
                   />
+                </div>
+              )}
+
+              {/* Artist Profile Photo (Optional for Artist Signup) */}
+              {activeMode === "signup" && activeRole === "artist" && (
+                <div>
+                  <label
+                    htmlFor="auth-avatar"
+                    className="block mb-1 text-small font-medium text-text"
+                  >
+                    תמונת פרופיל
+                  </label>
+                  <div className="flex items-center gap-3">
+                    <div className="h-12 w-12 shrink-0 overflow-hidden rounded-full border border-border bg-sand/60 flex items-center justify-center text-text-muted">
+                      {avatarUrl ? (
+                        <img src={avatarUrl} alt="תמונת פרופיל" className="h-full w-full object-cover" />
+                      ) : (
+                        <span className="text-lg">🎨</span>
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <input
+                        id="auth-avatar"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleAvatarChange}
+                        className="w-full text-caption text-text-muted file:me-3 file:rounded-control file:border-0 file:bg-sand/80 file:px-3 file:py-1.5 file:text-caption file:font-medium file:text-text hover:file:bg-sand cursor-pointer"
+                      />
+                      <p className="mt-1 text-caption text-text-muted">
+                        תמונה עוזרת ללקוחות להתחבר לאמן שמאחורי היצירה.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               )}
 
