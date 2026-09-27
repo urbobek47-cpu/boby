@@ -10,11 +10,12 @@ import { useAuth } from "@/components/auth/auth-context";
 import { Price } from "@/components/catalog/price";
 import { Button } from "@/components/ui/button";
 import { createOrderAtomic } from "@/lib/orders/reservation-engine";
+import { isValidIsraeliPhone, normalizeIsraeliPhone } from "@/lib/phone";
 
 export default function CheckoutPage() {
   const router = useRouter();
   const locale = useLocale() as Locale;
-  const { user } = useAuth();
+  const { user, login } = useAuth();
   const {
     cartId,
     items,
@@ -49,8 +50,9 @@ export default function CheckoutPage() {
     if (user) {
       if (!fullName) setFullName(user.name);
       if (!email) setEmail(user.email);
+      if (!phone && user.phone) setPhone(user.phone);
     }
-  }, [user, fullName, email]);
+  }, [user, fullName, email, phone]);
 
   // Handle Order Submit / Creation
   const handleSubmitOrder = (e: React.FormEvent) => {
@@ -58,8 +60,37 @@ export default function CheckoutPage() {
     setFormError(null);
 
     if (!fullName.trim() || !email.trim() || !phone.trim() || !street.trim() || !city.trim()) {
-      setFormError("אנא המלאו את כל שדות החובה המסומנים בכוכבית (*)");
+      if (!phone.trim()) {
+        setFormError("מספר טלפון נדרש להשלמת ההזמנה. נדרש מספר טלפון לצורך תיאום המשלוח ויצירת קשר בנוגע להזמנה.");
+      } else {
+        setFormError("אנא המלאו את כל שדות החובה המסומנים בכוכבית (*)");
+      }
       return;
+    }
+
+    if (!isValidIsraeliPhone(phone)) {
+      setFormError("מספר טלפון אינו תקין. נא להזין מספר טלפון ישראלי תקין (למשל: 050-1234567)");
+      return;
+    }
+
+    const normalizedPhone = normalizeIsraeliPhone(phone);
+    setPhone(normalizedPhone);
+
+    // Save phone to persistent profile if logged in and not already saved
+    if (user && user.phone !== normalizedPhone) {
+      login({
+        ...user,
+        phone: normalizedPhone,
+      });
+    }
+
+    let normalizedRecipientPhone = recipientPhone.trim();
+    if (isGift && normalizedRecipientPhone) {
+      if (!isValidIsraeliPhone(normalizedRecipientPhone)) {
+        setFormError("מספר טלפון של מקבל/ת המתנה אינו תקין. נא להזין מספר ישראלי תקין (למשל: 050-1234567)");
+        return;
+      }
+      normalizedRecipientPhone = normalizeIsraeliPhone(normalizedRecipientPhone);
     }
 
     if (items.length === 0) {
@@ -75,7 +106,7 @@ export default function CheckoutPage() {
         buyer: {
           name: fullName.trim(),
           email: email.trim(),
-          phone: phone.trim(),
+          phone: normalizedPhone,
           shippingAddress: {
             street: street.trim(),
             city: city.trim(),
@@ -87,7 +118,7 @@ export default function CheckoutPage() {
         gift: isGift
           ? {
               recipientName: recipientName.trim(),
-              recipientPhone: recipientPhone.trim(),
+              recipientPhone: normalizedRecipientPhone,
               giftMessage: giftMessage.trim(),
             }
           : null,
@@ -223,7 +254,7 @@ export default function CheckoutPage() {
 
               <div className="flex flex-col gap-1.5">
                 <label htmlFor="phone" className="text-caption font-semibold text-text">
-                  טלפון ליצירת קשר <span className="text-error">*</span>
+                  מספר טלפון לתיאום משלוח <span className="text-error">*</span>
                 </label>
                 <input
                   id="phone"
@@ -235,7 +266,17 @@ export default function CheckoutPage() {
                   placeholder="050-1234567"
                   className="rounded-control border border-stone/40 bg-surface px-3.5 py-2.5 text-small text-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-strong"
                 />
+                <p className="mt-0.5 text-caption text-text-muted">
+                  נשתמש במספר רק לצורך אימות החשבון, תיאום משלוח ויצירת קשר בנוגע להזמנה.
+                </p>
               </div>
+
+              {(!user?.phone || !phone.trim()) && (
+                <div role="note" className="sm:col-span-2 rounded-card bg-sand/60 p-3 text-caption text-accent-strong border border-sand flex items-center gap-2">
+                  <span>ℹ️</span>
+                  <span><strong>מספר טלפון נדרש להשלמת ההזמנה:</strong> נדרש מספר טלפון לצורך תיאום המשלוח ויצירת קשר בנוגע להזמנה.</span>
+                </div>
+              )}
             </div>
           </section>
 

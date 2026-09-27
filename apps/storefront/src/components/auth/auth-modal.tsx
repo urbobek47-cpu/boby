@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useAuth, UserRole, AuthMode } from "./auth-context";
+import { isValidIsraeliPhone, normalizeIsraeliPhone } from "@/lib/phone";
 
 export function AuthModal() {
   const {
@@ -99,7 +100,7 @@ export function AuthModal() {
         name: userName,
         email: email.trim(),
         role: role,
-        phone: role === "artist" ? phone.trim() : undefined,
+        phone: phone.trim() ? normalizeIsraeliPhone(phone.trim()) : undefined,
         studioName: role === "artist" ? studioName || userName : undefined,
         discipline: role === "artist" ? discipline : undefined,
       });

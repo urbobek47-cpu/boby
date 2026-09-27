@@ -9,6 +9,7 @@ import type { Artwork } from "@/lib/catalog/types";
 import { ArtworkCard } from "@/components/catalog/artwork-card";
 import { EditArtworkModal } from "@/components/artwork/edit-artwork-modal";
 import { buildCloudinaryUrl } from "@/lib/cloudinary";
+import { isValidIsraeliPhone, normalizeIsraeliPhone } from "@/lib/phone";
 
 export function AccountView() {
   const { user, openAuthModal, login, logout } = useAuth();
@@ -100,10 +101,22 @@ export function AccountView() {
 
   const handleProfileSave = (e: React.FormEvent) => {
     e.preventDefault();
+    setActionError(null);
+
+    let formattedPhone = phone.trim();
+    if (formattedPhone) {
+      if (!isValidIsraeliPhone(formattedPhone)) {
+        setActionError("מספר טלפון אינו תקין. נא להזין מספר טלפון ישראלי תקין (למשל: 050-1234567)");
+        return;
+      }
+      formattedPhone = normalizeIsraeliPhone(formattedPhone);
+      setPhone(formattedPhone);
+    }
+
     login({
       ...user,
       name: name.trim(),
-      phone: phone.trim(),
+      phone: formattedPhone || undefined,
       studioName: isArtist ? studioName.trim() : undefined,
       discipline: isArtist ? discipline : undefined,
     });
@@ -353,7 +366,7 @@ export function AccountView() {
 
             <div>
               <label htmlFor="acc-phone" className="block mb-1 text-small font-medium text-text">
-                מספר טלפון לתיאום
+                מספר טלפון
               </label>
               <input
                 id="acc-phone"
@@ -364,6 +377,9 @@ export function AccountView() {
                 placeholder="050-1234567"
                 className="min-h-11 w-full rounded-control border border-border bg-surface px-3.5 text-body focus:border-accent-strong focus:outline-none"
               />
+              <p className="mt-1 text-caption text-text-muted">
+                נשתמש במספר רק לצורך אימות החשבון, תיאום משלוח ויצירת קשר בנוגע להזמנה.
+              </p>
             </div>
 
             {isArtist && (
