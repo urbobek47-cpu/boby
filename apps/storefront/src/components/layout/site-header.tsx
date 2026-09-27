@@ -7,10 +7,12 @@ import { UserMenu } from "@/components/auth/user-menu";
 import { HeaderSearchBar } from "@/components/layout/header-search-bar";
 import { CategoryDrawer } from "@/components/layout/category-drawer";
 import { useCart } from "@/components/cart/cart-context";
+import { useAuth } from "@/components/auth/auth-context";
 
 export function SiteHeader() {
   const t = useTranslations("Nav");
   const { itemCount, openCart } = useCart();
+  const { user, openAuthModal } = useAuth();
 
   return (
     <header className="relative z-40 bg-surface/95 backdrop-blur-md">
@@ -38,12 +40,22 @@ export function SiteHeader() {
 
           {/* User Profile & Actions */}
           <div className="flex items-center gap-1 sm:gap-2 text-small shrink-0">
-            <Link
-              href="/upload"
-              className="hidden lg:inline-flex items-center gap-1 rounded-full bg-accent-strong px-3 py-1.5 text-small font-medium text-surface hover:bg-accent-hover transition-colors shadow-sm"
-            >
-              ✨ להעלות יצירה
-            </Link>
+            {user ? (
+              <Link
+                href="/upload/new"
+                className="hidden lg:inline-flex items-center gap-1 rounded-full bg-accent-strong px-3 py-1.5 text-small font-medium text-surface hover:bg-accent-hover transition-colors shadow-sm"
+              >
+                ✨ להעלות יצירה
+              </Link>
+            ) : (
+              <button
+                type="button"
+                onClick={() => openAuthModal("artist", "login")}
+                className="hidden lg:inline-flex items-center gap-1 rounded-full bg-accent-strong px-3 py-1.5 text-small font-medium text-surface hover:bg-accent-hover transition-colors shadow-sm"
+              >
+                ✨ להעלות יצירה
+              </button>
+            )}
             <Link
               href={{ pathname: "/account", query: { tab: "saved" } }}
               aria-label="יצירות אהובות"

@@ -17,9 +17,45 @@ interface SelectedImage {
 }
 
 export function UploadArtworkForm() {
-  const { user } = useAuth();
+  const { user, openAuthModal } = useAuth();
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  React.useEffect(() => {
+    if (!user) {
+      openAuthModal("artist", "login");
+    }
+  }, [user, openAuthModal]);
+
+  if (!user) {
+    return (
+      <div className="mx-auto max-w-xl rounded-panel border border-border bg-sand/30 p-8 text-center my-8 shadow-sm">
+        <span className="flex h-12 w-12 items-center justify-center rounded-full bg-accent text-xl text-surface mx-auto mb-4">
+          🎨
+        </span>
+        <h1 className="text-h2 font-medium text-text">התחברות / הרשמה כאמן</h1>
+        <p className="mt-2 text-small text-text-muted">
+          כדי להעלות יצירות חדשות לגלריית BOBY, נא להתחבר לחשבון אמן או להירשם כאמן חדש.
+        </p>
+        <div className="mt-6 flex justify-center gap-3">
+          <button
+            type="button"
+            onClick={() => openAuthModal("artist", "login")}
+            className="rounded-control bg-accent-strong px-5 py-2.5 text-small font-medium text-surface hover:bg-accent-hover transition-colors"
+          >
+            התחברות אמן
+          </button>
+          <button
+            type="button"
+            onClick={() => openAuthModal("artist", "signup")}
+            className="rounded-control border border-border bg-surface px-5 py-2.5 text-small font-medium text-text hover:bg-stone/50 transition-colors"
+          >
+            הרשמת אמן חדש
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   // Form Fields State
   const [artistName, setArtistName] = useState(user?.name || "אמן סטודיו BOBY");

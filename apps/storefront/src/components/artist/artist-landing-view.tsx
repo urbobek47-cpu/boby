@@ -2,8 +2,10 @@
 
 import React from "react";
 import { Link } from "@/i18n/navigation";
+import { useAuth } from "@/components/auth/auth-context";
 
 export function ArtistLandingView() {
+  const { user, openAuthModal } = useAuth();
   return (
     <div className="flex flex-col gap-12 md:gap-20">
       {/* Hero Section */}
@@ -25,13 +27,24 @@ export function ArtistLandingView() {
           </p>
 
           <div className="mt-2 flex flex-wrap items-center gap-3 sm:gap-4">
-            <Link
-              href="/upload/new"
-              className="inline-flex items-center gap-2 rounded-control bg-accent-strong px-6 py-3.5 text-body font-medium text-surface transition-colors hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-strong shadow-md"
-            >
-              <span>העלאת יצירה חדשה</span>
-              <span>✨</span>
-            </Link>
+            {user ? (
+              <Link
+                href="/upload/new"
+                className="inline-flex items-center gap-2 rounded-control bg-accent-strong px-6 py-3.5 text-body font-medium text-surface transition-colors hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-strong shadow-md"
+              >
+                <span>העלאת יצירה חדשה</span>
+                <span>✨</span>
+              </Link>
+            ) : (
+              <button
+                type="button"
+                onClick={() => openAuthModal("artist", "login")}
+                className="inline-flex items-center gap-2 rounded-control bg-accent-strong px-6 py-3.5 text-body font-medium text-surface transition-colors hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-strong shadow-md"
+              >
+                <span>התחברות / הרשמה כאמן</span>
+                <span>✨</span>
+              </button>
+            )}
 
             <a
               href="#how-it-works"
@@ -176,13 +189,24 @@ export function ArtistLandingView() {
           </p>
         </div>
 
-        <Link
-          href="/upload/new"
-          className="inline-flex shrink-0 items-center gap-2 rounded-control bg-accent-strong px-7 py-3.5 text-body font-medium text-surface transition-colors hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-strong shadow-sm"
-        >
-          <span>להעלות יצירה חדשה כעת</span>
-          <span>✨</span>
-        </Link>
+        {user ? (
+          <Link
+            href="/upload/new"
+            className="inline-flex shrink-0 items-center gap-2 rounded-control bg-accent-strong px-7 py-3.5 text-body font-medium text-surface transition-colors hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-strong shadow-sm"
+          >
+            <span>להעלות יצירה חדשה כעת</span>
+            <span>✨</span>
+          </Link>
+        ) : (
+          <button
+            type="button"
+            onClick={() => openAuthModal("artist", "login")}
+            className="inline-flex shrink-0 items-center gap-2 rounded-control bg-accent-strong px-7 py-3.5 text-body font-medium text-surface transition-colors hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-strong shadow-sm"
+          >
+            <span>התחברות / הרשמה כאמן</span>
+            <span>✨</span>
+          </button>
+        )}
       </section>
     </div>
   );
