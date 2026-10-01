@@ -90,13 +90,15 @@ export function AuthModal() {
         setError("נא להזין שם מלא");
         return;
       }
-      // Mandatory Phone Number check specifically for Artist Signup
+      // Phone Number Validation
       if (activeRole === "artist") {
-        const cleanPhone = phone.replace(/\D/g, "");
-        if (!phone.trim() || cleanPhone.length < 9) {
+        if (!phone.trim() || !isValidIsraeliPhone(phone)) {
           setError("נא להזין מספר טלפון תקין ליצירת קשר עם הסטודיו (לדוגמה: 050-1234567)");
           return;
         }
+      } else if (phone.trim() && !isValidIsraeliPhone(phone)) {
+        setError("נא להזין מספר טלפון ישראלי תקין (למשל: 050-1234567)");
+        return;
       }
       if (password !== confirmPassword) {
         setError("הסיסמאות אינן תואמות");
@@ -355,6 +357,30 @@ export function AuthModal() {
                     }
                     className="min-h-11 w-full rounded-control border border-border bg-surface px-3.5 text-body placeholder:text-text-muted/60 focus:border-accent-strong focus:outline-none focus:ring-1 focus:ring-accent-strong"
                   />
+                </div>
+              )}
+
+              {/* Optional Customer Phone Number (Signup) */}
+              {activeMode === "signup" && activeRole === "customer" && (
+                <div>
+                  <label
+                    htmlFor="auth-phone-customer"
+                    className="block mb-1 text-small font-medium text-text"
+                  >
+                    מספר טלפון (אופציונלי)
+                  </label>
+                  <input
+                    id="auth-phone-customer"
+                    type="tel"
+                    dir="ltr"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="050-1234567"
+                    className="min-h-11 w-full rounded-control border border-border bg-surface px-3.5 text-body placeholder:text-text-muted/60 focus:border-accent-strong focus:outline-none focus:ring-1 focus:ring-accent-strong"
+                  />
+                  <p className="mt-1 text-caption text-text-muted">
+                    נשתמש במספר רק לצורך אימות החשבון, תיאום משלוח ויצירת קשר בנוגע להזמנה.
+                  </p>
                 </div>
               )}
 
