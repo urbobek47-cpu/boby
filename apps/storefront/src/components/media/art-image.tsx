@@ -42,7 +42,7 @@ export function ArtImage({
   // Local static assets (the /mock/ concept placeholders) bypass Cloudinary
   // optimisation. They are concept images, not real works by the named artists,
   // and must be replaced with approved photography before a real launch.
-  const isLocal = !!publicId && publicId.startsWith("/");
+  const isLocal = !!publicId && (publicId.startsWith("/") || publicId.startsWith("http") || publicId.startsWith("data:"));
 
   return (
     <div

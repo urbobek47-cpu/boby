@@ -848,7 +848,7 @@ const artworks: Artwork[] = [
 
 export { artworks };
 
-import { insertArtworkDb, getArtworkBySlugDb, listArtworksDb } from "../supabase";
+import { insertArtworkDb, getArtworkBySlugDb, listArtworksDb, getArtistProfilePhotoDb } from "../supabase";
 import { getCustomArtworksServer, saveCustomArtworkServer, removeCustomArtworkServer } from "./custom-artworks-store";
 
 const dynamicArtworksStore: Artwork[] = [];

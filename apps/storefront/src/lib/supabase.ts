@@ -116,6 +116,7 @@ export async function insertArtworkDb(artwork: Artwork): Promise<boolean> {
       return false;
     }
     console.log(`[Supabase Insert Success] Saved artwork to Supabase: ${artwork.slug}`);
+    clearDbArtworksCache();
     return true;
   } catch (err) {
     console.error("[Supabase Insert Crash]", err);
@@ -170,12 +171,24 @@ export async function getArtworkBySlugDb(slug: string): Promise<Artwork | null> 
   }
 }
 
-export async function listArtworksDb(): Promise<Artwork[]> {
+let dbArtworksCache: { data: Artwork[]; timestamp: number } | null = null;
+const CACHE_TTL_MS = 15000; // 15 seconds in-memory cache for instant navigation
+
+export function clearDbArtworksCache() {
+  dbArtworksCache = null;
+}
+
+export async function listArtworksDb(forceFresh = false): Promise<Artwork[]> {
+  const now = Date.now();
+  if (!forceFresh && dbArtworksCache && now - dbArtworksCache.timestamp < CACHE_TTL_MS) {
+    return dbArtworksCache.data;
+  }
+
   const client = getSupabaseClient();
-  if (!client) return [];
+  if (!client) return dbArtworksCache?.data || [];
   try {
     const timeoutPromise = new Promise<{ data: null; error: { message: string } }>((resolve) =>
-      setTimeout(() => resolve({ data: null, error: { message: "upstream request timeout" } }), 4000)
+      setTimeout(() => resolve({ data: null, error: { message: "upstream request timeout" } }), 800)
     );
     const queryPromise = client
       .from("artworks")
@@ -185,13 +198,17 @@ export async function listArtworksDb(): Promise<Artwork[]> {
     const { data, error } = await Promise.race([queryPromise, timeoutPromise]);
 
     if (error || !data) {
-      console.warn("[Supabase List Warning]", error?.message);
-      return [];
+      if (error?.message) {
+        console.warn("[Supabase List Warning]", error.message);
+      }
+      return dbArtworksCache?.data || [];
     }
-    return data.map(mapRowToArtwork);
+    const mapped = data.map(mapRowToArtwork);
+    dbArtworksCache = { data: mapped, timestamp: now };
+    return mapped;
   } catch (err) {
     console.error("[Supabase List Crash]", err);
-    return [];
+    return dbArtworksCache?.data || [];
   }
 }
 
@@ -214,6 +231,7 @@ export async function updateArtworkDb(artwork: Artwork, ownerSlug: string): Prom
       return false;
     }
     console.log(`[Supabase Update Success] Updated artwork: ${artwork.slug}`);
+    clearDbArtworksCache();
     return true;
   } catch (err) {
     console.error("[Supabase Update Exception]", err);
@@ -243,10 +261,60 @@ export async function deleteArtworkDb(slug: string, ownerSlug: string): Promise<
     // Also delete inventory entry if exists
     await client.from("inventory").delete().eq("slug", slug);
     console.log(`[Supabase Delete Success] Deleted artwork: ${slug}`);
+    clearDbArtworksCache();
     return true;
   } catch (err) {
     console.error(`[Supabase Delete Exception for ${slug}]`, err);
     return false;
   }
 }
+
+export async function updateArtistProfilePhotoDb(
+  artistSlug: string,
+  portraitPublicId: string | null
+): Promise<boolean> {
+  const client = getSupabaseClient();
+  if (!client) {
+    console.warn("[Supabase Artist Photo Warning] Client unavailable.");
+    return false;
+  }
+  try {
+    const { error } = await client.from("artists").upsert(
+      {
+        slug: artistSlug,
+        portrait_public_id: portraitPublicId,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "slug" }
+    );
+
+    if (error) {
+      console.error("[Supabase Artist Photo Error]", error.message);
+      return false;
+    }
+    console.log(`[Supabase Artist Photo Success] Updated photo for artist: ${artistSlug}`);
+    return true;
+  } catch (err) {
+    console.error("[Supabase Artist Photo Exception]", err);
+    return false;
+  }
+}
+
+export async function getArtistProfilePhotoDb(artistSlug: string): Promise<string | null> {
+  const client = getSupabaseClient();
+  if (!client) return null;
+  try {
+    const { data } = await client
+      .from("artists")
+      .select("portrait_public_id")
+      .eq("slug", artistSlug)
+      .maybeSingle();
+
+    return data?.portrait_public_id || null;
+  } catch (err) {
+    console.error("[Supabase Get Artist Photo Exception]", err);
+    return null;
+  }
+}
+
 

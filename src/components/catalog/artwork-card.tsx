@@ -59,9 +59,23 @@ export function ArtworkCard({ artwork }: { artwork: Artwork }) {
           </div>
 
           <div className="flex items-center justify-between gap-2 text-caption text-[#5C483A]">
-            <p className="truncate font-medium text-[#5C483A]">
-              <bdi>{artwork.artist.displayName[locale] || artwork.artist.displayName.he}</bdi>
-            </p>
+            <div className="flex items-center gap-1.5 min-w-0">
+              {artwork.artist?.portraitPublicId && (
+                <span className="relative h-5 w-5 shrink-0 overflow-hidden rounded-full border border-[#D5C4B1] bg-sand/60">
+                  <ArtImage
+                    publicId={artwork.artist.portraitPublicId}
+                    alt=""
+                    aspectRatio={1}
+                    sizes="20px"
+                    rounded="rounded-full"
+                    className="h-full w-full object-cover"
+                  />
+                </span>
+              )}
+              <p className="truncate font-medium text-[#5C483A]">
+                <bdi>{artwork.artist.displayName[locale] || artwork.artist.displayName.he}</bdi>
+              </p>
+            </div>
             <span className={statusMuted ? "text-caption text-[#5C483A]/70 shrink-0" : "text-caption text-accent-strong font-medium shrink-0"}>
               {t(status.key, status.values)}
             </span>

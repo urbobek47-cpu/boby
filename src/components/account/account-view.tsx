@@ -33,6 +33,7 @@ export function AccountView() {
   const [deletingSlug, setDeletingSlug] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -44,22 +45,104 @@ export function AccountView() {
     }
   }, [user]);
 
-  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
-    if (!file.type.startsWith("image/")) {
-      setActionError("נא לבחור קובץ תמונה תקין (JPG, PNG, WebP)");
+    if (!file || !user) return;
+    setActionError(null);
+
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/avif", "image/jpg"];
+    if (!allowedTypes.includes(file.type.toLowerCase())) {
+      setActionError("נא לבחור קובץ תמונה תקין (JPG, PNG, WebP או AVIF)");
       return;
     }
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      setAvatarUrl(event.target?.result as string);
-    };
-    reader.readAsDataURL(file);
+
+    if (file.size > 5 * 1024 * 1024) {
+      setActionError("גודל התמונה עולה על 5MB. נא לבחור תמונה קטנה יותר.");
+      return;
+    }
+
+    try {
+      setIsUploadingAvatar(true);
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("artistSlug", user.email);
+
+      const res = await fetch("/api/artist/profile-photo", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.reason || "שגיאה בהעלאת תמונת הפרופיל");
+      }
+
+      const newAvatarUrl = data.avatarUrl;
+      setAvatarUrl(newAvatarUrl);
+      login({
+        ...user,
+        avatarUrl: newAvatarUrl,
+      });
+      setActionSuccess("תמונת הפרופיל עודכנה בהצלחה במערכת");
+      setTimeout(() => setActionSuccess(null), 3000);
+    } catch (err: any) {
+      console.error("[Avatar Upload Error]", err);
+      setActionError(err.message || "אירעה שגיאה בהעלאת תמונת הפרופיל");
+    } finally {
+      setIsUploadingAvatar(false);
+    }
   };
+
+  const handleRemoveAvatar = async () => {
+    if (!user) return;
+    setActionError(null);
+    try {
+      setIsUploadingAvatar(true);
+      const res = await fetch("/api/artist/profile-photo", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ artistSlug: user.email }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.reason || "שגיאה בהסרת תמונת הפרופיל");
+      }
+
+      setAvatarUrl("");
+      login({
+        ...user,
+        avatarUrl: undefined,
+      });
+      setActionSuccess("תמונת הפרופיל הוסרה בהצלחה");
+      setTimeout(() => setActionSuccess(null), 3000);
+    } catch (err: any) {
+      console.error("[Avatar Remove Error]", err);
+      setActionError(err.message || "אירעה שגיאה בהסרת תמונת הפרופיל");
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  };
+
 
   const loadData = async () => {
     if (!user) return;
+
+    // 0. Sync profile photo from DB if available
+    try {
+      const photoRes = await fetch(`/api/artist/profile-photo?artistSlug=${encodeURIComponent(user.email)}`);
+      const photoData = await photoRes.json();
+      if (photoRes.ok && photoData.success && photoData.avatarUrl) {
+        setAvatarUrl(photoData.avatarUrl);
+        login({
+          ...user,
+          avatarUrl: photoData.avatarUrl,
+        });
+      }
+    } catch {
+      // Ignore fetch error
+    }
+
     const all = await listArtworks();
 
     // 1. Liked artworks
@@ -239,13 +322,19 @@ export function AccountView() {
       {/* User Header Profile Card */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-panel border border-border bg-surface p-6 shadow-sm">
         <div className="flex items-center gap-4">
-          <span
-            className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-h2 font-bold text-surface ${
-              isArtist ? "bg-accent" : "bg-deep"
-            }`}
-          >
-            {user.name.charAt(0).toUpperCase()}
-          </span>
+          <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full border border-border bg-sand/60 flex items-center justify-center shadow-xs">
+            {avatarUrl ? (
+              <img src={avatarUrl} alt={user.name} className="h-full w-full object-cover" />
+            ) : (
+              <span
+                className={`flex h-full w-full items-center justify-center text-h2 font-bold text-surface ${
+                  isArtist ? "bg-accent" : "bg-deep"
+                }`}
+              >
+                {user.name.charAt(0).toUpperCase()}
+              </span>
+            )}
+          </div>
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-h2 font-medium text-text">
@@ -399,6 +488,54 @@ export function AccountView() {
               </p>
             </div>
 
+            <div className="sm:col-span-2 border-t border-border/60 pt-4">
+              <label className="block mb-2 text-small font-medium text-text">
+                תמונת פרופיל
+              </label>
+              <div className="flex flex-wrap items-center gap-4">
+                <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full border border-border bg-sand/60 flex items-center justify-center text-text-muted shadow-xs">
+                  {isUploadingAvatar ? (
+                    <div className="h-6 w-6 animate-spin rounded-full border-2 border-accent-strong border-t-transparent" />
+                  ) : avatarUrl ? (
+                    <img src={avatarUrl} alt="תמונת פרופיל" className="h-full w-full object-cover" />
+                  ) : (
+                    <span className="text-3xl">👤</span>
+                  )}
+                </div>
+                <div className="flex flex-col gap-2 min-w-[240px]">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <input
+                      id="acc-avatar-input"
+                      type="file"
+                      accept="image/png,image/jpeg,image/webp,image/avif"
+                      onChange={handleAvatarChange}
+                      disabled={isUploadingAvatar}
+                      className="hidden"
+                    />
+                    <label
+                      htmlFor="acc-avatar-input"
+                      className="inline-flex items-center gap-2 rounded-control bg-surface border border-border px-4 py-2.5 text-small font-medium text-text hover:bg-stone/50 hover:border-accent-strong transition-colors cursor-pointer shadow-2xs"
+                    >
+                      <span>📷</span>
+                      <span>{avatarUrl ? "החלפת תמונת פרופיל מהגלריה" : "הוספת תמונת פרופיל מהגלריה"}</span>
+                    </label>
+                    {avatarUrl && !isUploadingAvatar && (
+                      <button
+                        type="button"
+                        onClick={handleRemoveAvatar}
+                        className="text-small text-red-600 hover:text-red-700 font-medium px-3 py-2 rounded-control hover:bg-red-50 transition-colors"
+                      >
+                        🗑️ הסרת תמונה
+                      </button>
+                    )}
+                  </div>
+                  <p className="text-caption text-text-muted">
+                    תמונה עוזרת ללקוחות להתחבר אליך. התמונה תישאר בחשבונך ותוצג בעמוד האמן וליד היצירות שתעלה. (עד 5MB, קבצי JPG, PNG, WebP או AVIF)
+                  </p>
+                </div>
+              </div>
+            </div>
+
             {isArtist && (
               <>
                 <div>
@@ -430,33 +567,6 @@ export function AccountView() {
                     <option value="צורפות ותכשיטים">צורפות ותכשיטים</option>
                     <option value="זכוכית ומתכת">זכוכית ומתכת</option>
                   </select>
-                </div>
-
-                <div className="sm:col-span-2">
-                  <label htmlFor="acc-avatar" className="block mb-1 text-small font-medium text-text">
-                    תמונת פרופיל
-                  </label>
-                  <div className="flex items-center gap-3">
-                    <div className="h-14 w-14 shrink-0 overflow-hidden rounded-full border border-border bg-sand/60 flex items-center justify-center text-text-muted">
-                      {avatarUrl ? (
-                        <img src={avatarUrl} alt="תמונת פרופיל" className="h-full w-full object-cover" />
-                      ) : (
-                        <span className="text-xl">🎨</span>
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <input
-                        id="acc-avatar"
-                        type="file"
-                        accept="image/*"
-                        onChange={handleAvatarChange}
-                        className="w-full text-caption text-text-muted file:me-3 file:rounded-control file:border-0 file:bg-sand/80 file:px-3 file:py-1.5 file:text-caption file:font-medium file:text-text hover:file:bg-sand cursor-pointer"
-                      />
-                      <p className="mt-1 text-caption text-text-muted">
-                        תמונה עוזרת ללקוחות להתחבר לאמן שמאחורי היצירה.
-                      </p>
-                    </div>
-                  </div>
                 </div>
               </>
             )}
@@ -629,4 +739,3 @@ export function AccountView() {
     </div>
   );
 }
-

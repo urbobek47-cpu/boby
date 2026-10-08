@@ -848,7 +848,7 @@ const artworks: Artwork[] = [
 
 export { artworks };
 
-import { insertArtworkDb, getArtworkBySlugDb, listArtworksDb } from "../supabase";
+import { insertArtworkDb, getArtworkBySlugDb, listArtworksDb, getArtistProfilePhotoDb } from "../supabase";
 import { getCustomArtworksServer, saveCustomArtworkServer, removeCustomArtworkServer } from "./custom-artworks-store";
 
 const dynamicArtworksStore: Artwork[] = [];
@@ -1061,7 +1061,34 @@ export async function listArtistSlugs(): Promise<string[]> {
 
 export async function getArtistBySlug(slug: string): Promise<Artist | null> {
   const all = await listArtworks();
-  return all.find((a) => a.artist.slug === slug)?.artist ?? null;
+  let decodedSlug = slug;
+  try { decodedSlug = decodeURIComponent(slug); } catch {}
+
+  const found = all.find((a) => {
+    const s = (a.artist?.slug || "").toLowerCase();
+    return s === slug.toLowerCase() || s === decodedSlug.toLowerCase() || s === slug.split("@")[0].toLowerCase();
+  })?.artist ?? null;
+
+  const photoFromDb = await getArtistProfilePhotoDb(decodedSlug) || await getArtistProfilePhotoDb(slug);
+
+  if (found) {
+    return {
+      ...found,
+      portraitPublicId: photoFromDb || found.portraitPublicId,
+    };
+  }
+
+  if (photoFromDb) {
+    return {
+      slug: slug,
+      displayName: { he: slug.split("@")[0], en: slug.split("@")[0] },
+      location: { he: "ישראל", en: "Israel" },
+      bio: { he: "אמן/ית יוצר/ת ב-BOBY.", en: "BOBY Artist" },
+      portraitPublicId: photoFromDb,
+    };
+  }
+
+  return null;
 }
 
 export async function listArtworksByArtist(slug: string): Promise<Artwork[]> {

@@ -9,6 +9,7 @@ import type { Artwork } from "@/lib/catalog/types";
 import { ArtworkGallery, type GalleryImage } from "@/components/artwork/artwork-gallery";
 import { PurchasePanel } from "@/components/artwork/purchase-panel";
 import { ArtistCard } from "@/components/artwork/artist-card";
+import { ArtImage } from "@/components/media/art-image";
 import { ArtworkCard } from "@/components/catalog/artwork-card";
 import { BreadcrumbJsonLd } from "@/components/seo/breadcrumb-jsonld";
 import { buildCloudinaryUrl } from "@/lib/cloudinary";
@@ -146,9 +147,22 @@ function ArtworkDetail({ artwork, otherArtworks }: { artwork: Artwork; otherArtw
       <div className="mt-16 flex flex-col gap-16 md:mt-24">
         <section className="max-w-[var(--container-prose)] rounded-panel border border-border bg-sand/50 p-6 md:p-8">
           <div className="flex items-center gap-3">
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-accent text-surface text-small font-semibold">
-              🎨
-            </span>
+            {artwork.artist?.portraitPublicId ? (
+              <span className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full border border-border bg-stone">
+                <ArtImage
+                  publicId={artwork.artist.portraitPublicId}
+                  alt=""
+                  aspectRatio={1}
+                  sizes="40px"
+                  rounded="rounded-full"
+                  className="h-full w-full object-cover"
+                />
+              </span>
+            ) : (
+              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-accent text-surface text-small font-semibold">
+                🎨
+              </span>
+            )}
             <div>
               <h2 className="text-h2 font-medium text-text">סיפור היצירה והאמן</h2>
               <p className="text-caption text-text-muted">

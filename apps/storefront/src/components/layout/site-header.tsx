@@ -27,7 +27,7 @@ export function SiteHeader() {
             <Link
               href="/"
               aria-label={t("brand")}
-              className="font-display text-[1.2rem] sm:text-[1.4rem] font-medium tracking-[0.2em] text-text shrink-0 md:text-[1.65rem]"
+              className="font-display text-[1.2rem] sm:text-[1.4rem] font-medium tracking-[0.2em] text-text shrink-0 md:text-[1.65rem] hover:opacity-80 transition-opacity cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-strong rounded-control px-1"
             >
               BOBY
             </Link>

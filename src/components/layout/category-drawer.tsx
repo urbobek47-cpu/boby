@@ -2,12 +2,13 @@
 
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { Link } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
 import { useCart } from "@/components/cart/cart-context";
 import { useAuth } from "@/components/auth/auth-context";
 import { getLikedSlugs } from "@/components/ui/like-button";
 
 export function CategoryDrawer() {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [newsletterEmail, setNewsletterEmail] = useState("");
@@ -15,6 +16,15 @@ export function CategoryDrawer() {
   const [likedCount, setLikedCount] = useState(0);
   const { user, openAuthModal } = useAuth();
   const { itemCount, openCart } = useCart();
+
+  const handleGoHome = (e?: React.MouseEvent) => {
+    if (e) e.preventDefault();
+    setIsOpen(false);
+    router.push("/");
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
 
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
@@ -140,12 +150,16 @@ export function CategoryDrawer() {
       >
         {/* Header: pinned at top */}
         <div className="flex items-center justify-between border-b border-border p-6 shrink-0 bg-surface">
-          <div>
-            <span className="text-caption font-bold text-accent-strong uppercase tracking-wide">
+          <Link
+            href="/"
+            onClick={handleGoHome}
+            className="text-start group focus-visible:outline-none"
+          >
+            <span className="text-caption font-bold text-accent-strong uppercase tracking-wide group-hover:underline">
               תפריט BOBY
             </span>
             <h2 className="text-h3 font-medium text-text">ניווט וקטגוריות</h2>
-          </div>
+          </Link>
           <button
             type="button"
             onClick={() => setIsOpen(false)}
@@ -169,8 +183,8 @@ export function CategoryDrawer() {
             {/* 1. Discover / Home (גלה) */}
             <Link
               href="/"
-              onClick={() => setIsOpen(false)}
-              className="flex items-center justify-between rounded-panel border border-border/80 bg-surface p-3.5 transition-all hover:border-accent-strong hover:bg-sand"
+              onClick={handleGoHome}
+              className="flex items-center justify-between rounded-panel border border-border/80 bg-surface p-3.5 transition-all hover:border-accent-strong hover:bg-sand cursor-pointer"
             >
               <div className="flex items-center gap-3">
                 <span className="flex h-9 w-9 items-center justify-center rounded-full bg-sand text-text">

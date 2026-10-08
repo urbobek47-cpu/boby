@@ -48,10 +48,18 @@ export function AuthModal() {
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (!file.type.startsWith("image/")) {
-      setError("נא לבחור קובץ תמונה תקין (JPG, PNG, WebP)");
+    setError(null);
+
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/avif", "image/jpg"];
+    if (!allowedTypes.includes(file.type.toLowerCase())) {
+      setError("נא לבחור קובץ תמונה תקין (JPG, PNG, WebP או AVIF)");
       return;
     }
+    if (file.size > 5 * 1024 * 1024) {
+      setError("גודל תמונת הפרופיל עולה על 5MB");
+      return;
+    }
+
     const reader = new FileReader();
     reader.onload = (event) => {
       setAvatarUrl(event.target?.result as string);
@@ -108,12 +116,28 @@ export function AuthModal() {
 
     setIsLoading(true);
 
-    // Simulate network authentication request
-    setTimeout(() => {
-      setIsLoading(false);
+    const processAuth = async () => {
       const role = activeRole || "customer";
       const userName = fullName.trim() || email.split("@")[0];
+      let finalAvatarUrl = role === "artist" ? avatarUrl : undefined;
 
+      if (activeMode === "signup" && role === "artist" && avatarUrl && avatarUrl.startsWith("data:")) {
+        try {
+          const res = await fetch("/api/artist/profile-photo", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ dataUrl: avatarUrl, artistSlug: email.trim() }),
+          });
+          const photoData = await res.json();
+          if (photoData.success && photoData.avatarUrl) {
+            finalAvatarUrl = photoData.avatarUrl;
+          }
+        } catch (err) {
+          console.warn("[Avatar Upload Exception during signup]", err);
+        }
+      }
+
+      setIsLoading(false);
       login({
         name: userName,
         email: email.trim(),
@@ -121,7 +145,7 @@ export function AuthModal() {
         phone: phone.trim() ? normalizeIsraeliPhone(phone.trim()) : undefined,
         studioName: role === "artist" ? studioName || userName : undefined,
         discipline: role === "artist" ? discipline : undefined,
-        avatarUrl: role === "artist" ? avatarUrl : undefined,
+        avatarUrl: finalAvatarUrl,
       });
 
       setSuccessMessage(
@@ -129,7 +153,9 @@ export function AuthModal() {
           ? `התחברת בהצלחה כ${role === "artist" ? "אמן/ית" : "לקוח/ה"}!`
           : `הרשמתך כ${role === "artist" ? "אמן/ית" : "לקוח/ה"} הושלמה בהצלחה!`
       );
-    }, 600);
+    };
+
+    processAuth();
   };
 
   return (
