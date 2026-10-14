@@ -2,11 +2,6 @@
 
 import React, { useState } from "react";
 import { useRouter } from "@/i18n/navigation";
-import { routing } from "@/i18n/routing";
-
-export function generateStaticParams() {
-  return routing.locales.map((locale) => ({ locale }));
-}
 
 export default function AdminLoginPage() {
   const router = useRouter();
